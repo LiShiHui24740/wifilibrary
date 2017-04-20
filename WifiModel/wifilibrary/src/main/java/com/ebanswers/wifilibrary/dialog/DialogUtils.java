@@ -12,6 +12,7 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -23,6 +24,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.ebanswers.wifilibrary.R;
+import com.ebanswers.wifilibrary.WifiAdmin;
 import com.ebanswers.wifilibrary.WifiConfig;
 
 /**
@@ -48,7 +50,7 @@ public class DialogUtils {
         int width = activity.getResources().getDisplayMetrics().widthPixels;
         int height = activity.getResources().getDisplayMetrics().heightPixels;
         if (width > height) {
-            window.setLayout(width/ 2, WindowManager.LayoutParams.WRAP_CONTENT);
+            window.setLayout(width / 2, WindowManager.LayoutParams.WRAP_CONTENT);
         } else {
             window.setLayout(width - 80, WindowManager.LayoutParams.WRAP_CONTENT);
         }
@@ -60,6 +62,15 @@ public class DialogUtils {
         final TextView forget = (TextView) view.findViewById(R.id.id_tv_dialog_forget);
         final TextView close = (TextView) view.findViewById(R.id.id_tv_dialog_close);
         name.setText(scanResult.SSID);
+        Log.d("lishihui_wifi","ssid:"+scanResult.SSID);
+        Log.d("lishihui_wifi","netId:"+WifiAdmin.getInstance(activity).IsConfiguration("\""+scanResult.SSID+"\""));
+        if (WifiAdmin.getInstance(activity).IsConfiguration("\""+scanResult.SSID+"\"") != -1) {
+            password.setVisibility(View.GONE);
+            showPassWord.setVisibility(View.GONE);
+        } else {
+            password.setVisibility(View.VISIBLE);
+            showPassWord.setVisibility(View.VISIBLE);
+        }
         password.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -107,7 +118,7 @@ public class DialogUtils {
         forget.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (callBack!=null){
+                if (callBack != null) {
                     callBack.ignore();
                 }
 
@@ -146,7 +157,7 @@ public class DialogUtils {
         int width = activity.getResources().getDisplayMetrics().widthPixels;
         int height = activity.getResources().getDisplayMetrics().heightPixels;
         if (width > height) {
-            window.setLayout(width/3, WindowManager.LayoutParams.WRAP_CONTENT);
+            window.setLayout(width / 3, WindowManager.LayoutParams.WRAP_CONTENT);
         } else {
             window.setLayout(width - 80, WindowManager.LayoutParams.WRAP_CONTENT);
         }
@@ -170,7 +181,7 @@ public class DialogUtils {
         int width = activity.getResources().getDisplayMetrics().widthPixels;
         int height = activity.getResources().getDisplayMetrics().heightPixels;
         if (width > height) {
-            window.setLayout(width/2, WindowManager.LayoutParams.WRAP_CONTENT);
+            window.setLayout(width / 2, WindowManager.LayoutParams.WRAP_CONTENT);
         } else {
             window.setLayout(width - 80, WindowManager.LayoutParams.WRAP_CONTENT);
         }
@@ -215,7 +226,7 @@ public class DialogUtils {
         int width = activity.getResources().getDisplayMetrics().widthPixels;
         int height = activity.getResources().getDisplayMetrics().heightPixels;
         if (width > height) {
-            window.setLayout(width/ 2, WindowManager.LayoutParams.WRAP_CONTENT);
+            window.setLayout(width / 2, WindowManager.LayoutParams.WRAP_CONTENT);
         } else {
             window.setLayout(width - 80, WindowManager.LayoutParams.WRAP_CONTENT);
         }
@@ -252,16 +263,16 @@ public class DialogUtils {
                     radioGroup.setTag(3);
                     psd_ll.setVisibility(View.VISIBLE);
                 }
-                if (checkedId==R.id.id_rb_open){
-                    if (wifi_name.getText().toString().length()>0){
+                if (checkedId == R.id.id_rb_open) {
+                    if (wifi_name.getText().toString().length() > 0) {
                         connect.setEnabled(true);
-                    }else {
+                    } else {
                         connect.setEnabled(false);
                     }
-                }else {
-                    if (wifi_name.getText().toString().length()>0&&wifi_password.getText().toString().length()>=8){
+                } else {
+                    if (wifi_name.getText().toString().length() > 0 && wifi_password.getText().toString().length() >= 8) {
                         connect.setEnabled(true);
-                    }else {
+                    } else {
                         connect.setEnabled(false);
                     }
                 }
@@ -277,15 +288,15 @@ public class DialogUtils {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s.length() >= 1) {
-                      if (psd_ll.getVisibility()==View.VISIBLE){
-                          if (wifi_password.getText().toString().length()>=8){
-                              connect.setEnabled(true);
-                          }else{
-                              connect.setEnabled(false);
-                          }
-                      }else{
-                          connect.setEnabled(true);
-                      }
+                    if (psd_ll.getVisibility() == View.VISIBLE) {
+                        if (wifi_password.getText().toString().length() >= 8) {
+                            connect.setEnabled(true);
+                        } else {
+                            connect.setEnabled(false);
+                        }
+                    } else {
+                        connect.setEnabled(true);
+                    }
                 } else {
                     connect.setEnabled(false);
                 }
@@ -305,7 +316,7 @@ public class DialogUtils {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s.length() >= 8&&wifi_name.getText().toString().length()>=1) {
+                if (s.length() >= 8 && wifi_name.getText().toString().length() >= 1) {
                     connect.setEnabled(true);
                 } else {
                     connect.setEnabled(false);
@@ -357,6 +368,7 @@ public class DialogUtils {
 
     public interface DialogAddWifiCallBack {
         void callBack(String ssid, String password, int type);
+
         void cancel();
     }
 }

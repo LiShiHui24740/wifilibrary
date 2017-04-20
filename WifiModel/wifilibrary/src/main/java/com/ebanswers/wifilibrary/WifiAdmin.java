@@ -55,7 +55,6 @@ public class WifiAdmin {
         List<WifiConfiguration> wifiConfigList = mWifiManager.getConfiguredNetworks();
         Log.i("IsConfiguration", String.valueOf(wifiConfigList.size()));
         for (int i = 0; i < wifiConfigList.size(); i++) {
-            Log.i(wifiConfigList.get(i).SSID, String.valueOf(wifiConfigList.get(i).networkId));
             if (wifiConfigList.get(i).SSID.equals(SSID)) {//地址相同
                 return wifiConfigList.get(i).networkId;
             }
@@ -113,29 +112,18 @@ public class WifiAdmin {
      * 添加指定网络
      **/
     public void addNetwork(WifiConfiguration paramWifiConfiguration) {
-        int id;
-        if (IsConfiguration(paramWifiConfiguration.SSID)!=-1){
-            id = mWifiManager.updateNetwork(paramWifiConfiguration);
-        }else{
+        int id = IsConfiguration(paramWifiConfiguration.SSID);
+        if (id == -1) {
             id = mWifiManager.addNetwork(paramWifiConfiguration);
+            Log.d("connectWifi", "updateNetwork:" + id);
         }
-        if (id!=-1)
-        mWifiManager.enableNetwork(id, true);
+        if (id != -1)
+            mWifiManager.enableNetwork(id, true);
     }
 
     //连接指定Id的WIFI
-    public boolean ConnectWifi(int wifiId) {
-        List<WifiConfiguration> wifiConfigList = mWifiManager.getConfiguredNetworks();
-        for (int i = 0; i < wifiConfigList.size(); i++) {
-            WifiConfiguration wifi = wifiConfigList.get(i);
-            if (wifi.networkId == wifiId) {
-                while (!(mWifiManager.enableNetwork(wifiId, true))) {//激活该Id，建立连接
-                    Log.i("ConnectWifi", String.valueOf(wifiConfigList.get(wifiId).status));//status:0--已经连接，1--不可连接，2--可以连接
-                }
-                return true;
-            }
-        }
-        return false;
+    public void ConnectWifi(int wifiId) {
+        mWifiManager.enableNetwork(wifiId, true);
     }
 
     public void disconnectWifi(int netId) {
@@ -146,20 +134,21 @@ public class WifiAdmin {
 
     public void removeWifi(String ssid, int netId) {
         int id = IsConfiguration(ssid);
-        Log.d("lishihuiId","id:"+id+",netId:"+netId);
-        if (id != -1&&id==netId) {
+        Log.d("lishihuiId", "id:" + id + ",netId:" + netId);
+        if (id != -1 && id == netId) {
             boolean flag = mWifiManager.removeNetwork(id);
             mWifiManager.saveConfiguration();
-            Log.d("lishihuiId","flag_ssid_id:"+flag);
+            Log.d("lishihuiId", "flag_ssid_id:" + flag);
         }
     }
+
     public void removeWifi(String ssid) {
         int id = IsConfiguration(ssid);
-        Log.d("lishihuiId","id:"+id);
+        Log.d("lishihuiId", "id:" + id);
         if (id != -1) {
             boolean flag = mWifiManager.removeNetwork(id);
             mWifiManager.saveConfiguration();
-            Log.d("lishihuiId","flag_id:"+flag);
+            Log.d("lishihuiId", "flag_id:" + flag);
         }
     }
 
