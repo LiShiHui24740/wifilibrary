@@ -5,20 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Description  Wifi连接广播接收,使用静态注册，添加以下广播
- * <intent-filter>
- * <action android:name="android.net.wifi.RSSI_CHANGED"/>
- * <action android:name="android.net.wifi.STATE_CHANGE"/>
- * <action android:name="android.net.wifi.WIFI_STATE_CHANGED"/>
- * <action android:name="android.net.wifi.SCAN_RESULTS"/>
- * <action android:name="android.net.wifi.supplicant.STATE_CHANGE" />
- * </intent-filter>
  * Created by chenqiao on 2015/11/10.
  */
 public class WifiReceiver extends BroadcastReceiver {
@@ -27,7 +19,6 @@ public class WifiReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d("WifiReceiver", "onReceive: intent.getAction() = " + intent.getAction());
         if (intent.getAction().equals(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION)) {
             int error = intent.getIntExtra(WifiManager.EXTRA_SUPPLICANT_ERROR, -1);
             if (error == WifiManager.ERROR_AUTHENTICATING) {
@@ -39,7 +30,6 @@ public class WifiReceiver extends BroadcastReceiver {
             System.out.println("网络状态改变");
             wifiStatus(WIFI_UPDATE);
             NetworkInfo info = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
-            Log.d("isSuccess1", "WifiReceiver info.getState():" + info.getState());
             if (info.getState() == NetworkInfo.State.DISCONNECTED) {
                 switch (info.getDetailedState()) {
                     case DISCONNECTED:
@@ -61,7 +51,6 @@ public class WifiReceiver extends BroadcastReceiver {
                 System.out.println("wifi网络连接成功");
                 wifiStatus(WIFI_CONNECT);
             } else if (info.getState() == NetworkInfo.State.CONNECTING) {
-                Log.d("loadDialog", "wifi正在连接");
                 wifiStatus(WIFI_OPENING);
             } else if (info.getState() == NetworkInfo.State.SUSPENDED) {
                 System.out.println("wifi连接暂停");
@@ -175,8 +164,8 @@ public class WifiReceiver extends BroadcastReceiver {
                         wifiStateChange.updateWifiList();
                         break;
                     case WIFI_CONNECT:
-                        wifiStateChange.connectWifi();
                         wifiStateChange.updateWifiList();
+                        wifiStateChange.connectWifi();
                         break;
                 }
             }

@@ -5,11 +5,6 @@
               android:gravity="center_vertical"
               android:orientation="vertical"
     >
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="20dp"
-        android:background="#f0f0f0"
-        />
     <LinearLayout
         android:id="@+id/id_ll_wifi_add"
         android:layout_width="match_parent"

@@ -8,8 +8,10 @@ import android.os.Bundle;
 
 public class StyleConfig {
     private Bundle mBundle;
-    public static final int TYPE1= 0x01;
-    public static final int TYPE2= 0x02;
+    public static final int TYPE1_1= 0x01;//listView,添加wifi和手动搜索为垂直排布
+    public static final int TYPE1_2= 0x02;//listView,添加wifi和手动搜索为水平排布
+    public static final int TYPE2_1= 0x03;//grideView,添加wifi和手动搜索为水平排布
+    public static final int TYPE2_2= 0x04;//grideView,添加wifi和手动搜索为水平排布
     private StyleConfig(Bundle bundle) {
         mBundle = bundle;
     }

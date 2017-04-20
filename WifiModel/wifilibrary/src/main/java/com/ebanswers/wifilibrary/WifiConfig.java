@@ -50,25 +50,25 @@ public class WifiConfig {
     /**
      * 保存着的Wifi
      */
-    public void setSaveWifiId(String BSSID,int wifiNetId) {
-        SharedPreferences.Editor edit = sharedPrefs.edit();
-        edit.putInt(BSSID, wifiNetId);
-        edit.commit();
-    }
-
-    public int getSaveWifiId(String BSSID) {
-        return sharedPrefs.getInt(BSSID, -1);
-    }
-
-    public void setBssid(String BSSID){
-        SharedPreferences.Editor edit = sharedPrefs.edit();
-        edit.putString("bssid", BSSID);
-        edit.commit();
-    }
-
-    public String getBssid(){
-        return sharedPrefs.getString("bssid", "");
-    }
+//    public void setSaveWifiId(String SSID,int wifiNetId) {
+//        SharedPreferences.Editor edit = sharedPrefs.edit();
+//        edit.putInt(SSID+"wifi", wifiNetId);
+//        edit.commit();
+//    }
+//
+//    public int getSaveWifiId(String SSID) {
+//        return sharedPrefs.getInt(SSID+"wifi", -1);
+//    }
+//
+//    public void setSsid(String SSID){
+//        SharedPreferences.Editor edit = sharedPrefs.edit();
+//        edit.putString("ssid_wifi", SSID);
+//        edit.commit();
+//    }
+//
+//    public String getSsid(){
+//        return sharedPrefs.getString("ssid_wifi", "");
+//    }
     /**
      * 获取已保存的Wifi密码
      *

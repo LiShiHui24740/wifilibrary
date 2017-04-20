@@ -3,6 +3,7 @@ package com.ebanswers.wifilibrary.p;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.net.wifi.ScanResult;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 
@@ -30,10 +31,10 @@ public class PresenterImpl implements IPresenter {
     private Executor threadPool = Executors.newCachedThreadPool();
     private String current_ssid, current_password;
 
-    public PresenterImpl(Context context, IViewController controller) {
+    public PresenterImpl(Context context, IViewController controller,List<ScanResult> list) {
         mContext = context;
         this.viewController = controller;
-        modelController = new ModelControllerImpl(context, this);
+        modelController = new ModelControllerImpl(context, this,list);
         WifiReceiver.bindWifiState(modelController);
         wifiReceiver = new WifiReceiver();
         IntentFilter intentFilter = new IntentFilter();
@@ -57,7 +58,6 @@ public class PresenterImpl implements IPresenter {
 
     @Override
     public void openWifiAndScan(final List<ScanResult> list) {
-        modelController.setScanResultlist(list);
         viewController.showOpenTip();
         scan();
     }
@@ -87,11 +87,14 @@ public class PresenterImpl implements IPresenter {
                 @Override
                 public void callBack(View view, ScanResult scanResult, String str) {
                     viewController.closeDisconnectDialog();
-                    WifiConfig.getInstance(mContext).removePasswd(scanResult.SSID);
-                    WifiAdmin.getInstance(mContext).removeConfiguredWifi(WifiConfig.getInstance(mContext).getSaveWifiId(scanResult.BSSID),true);
-                    WifiConfig.getInstance(mContext).setBssid("");
                     Log.d("disconnect", "scanResult.SSID:" + scanResult.SSID);
-                    Log.d("disconnect", "WifiConfig.getInstance(mContext).getSaveWifiId():" + WifiConfig.getInstance(mContext).getSaveWifiId(scanResult.SSID));
+                    WifiConfig.getInstance(mContext).removePasswd(scanResult.SSID);
+                    if (WifiAdmin.getInstance(mContext).getNetworkId() != -1) {
+                        int id = WifiAdmin.getInstance(mContext).getNetworkId();
+                        WifiAdmin.getInstance(mContext).disconnectWifi(id);
+                        WifiAdmin.getInstance(mContext).removeWifi("\"" + scanResult.SSID + "\"", id);
+                    }
+
                 }
 
                 @Override
@@ -107,9 +110,7 @@ public class PresenterImpl implements IPresenter {
         } else {
             final String security = scanResult.capabilities.toLowerCase();
             if (!security.contains("wpa") && !security.contains("wep")) {
-                WifiAdmin.getInstance(mContext).removeConfiguredWifi(WifiConfig.getInstance(mContext).getSaveWifiId(WifiConfig.getInstance(mContext).getBssid()),true);
-                WifiAdmin.getInstance(mContext).addNetwork(WifiAdmin.getInstance(mContext).createWifiInfo(scanResult.SSID, "", 1));
-                WifiConfig.getInstance(mContext).setBssid(scanResult.BSSID);
+                connectWifi(scanResult.SSID, "", "");
                 viewController.showLoadDialog();
             } else {
                 viewController.showInputPasswordDialog(scanResult, new DialogUtils.DialogCallBack() {
@@ -121,23 +122,21 @@ public class PresenterImpl implements IPresenter {
                         current_password = passward;
                         Log.d("isSuccess1", "scanResult.SSID:" + scanResult.SSID);
                         Log.d("isSuccess1", "passward:" + passward);
-                        //断开现有连接
-                        WifiAdmin.getInstance(mContext).removeConfiguredWifi(WifiConfig.getInstance(mContext).getSaveWifiId(WifiConfig.getInstance(mContext).getBssid()),true);
-                        WifiConfig.getInstance(mContext).setBssid(scanResult.BSSID);
                         if (security.contains("wpa")) {
-                            Log.d("isSuccess1", "wpa:");
-                            WifiAdmin.getInstance(mContext).addNetwork(WifiAdmin.getInstance(mContext).createWifiInfo(scanResult.SSID, passward, 3));
+                            Log.d("lishihui_netId", "wpa:" + scanResult.SSID + ",psd:" + passward);
+                            connectWifi(scanResult.SSID, passward, "wpa");
                         } else if (security.contains("wep")) {
-                            Log.d("isSuccess1", "wep:");
-                            WifiAdmin.getInstance(mContext).addNetwork(WifiAdmin.getInstance(mContext).createWifiInfo(scanResult.SSID, passward, 2));
+                            connectWifi(scanResult.SSID, passward, "wep");
                         }
                     }
 
                     @Override
                     public void ignore() {
+                        Log.d("isSuccess1", "ignore()");
+                        Log.d("isSuccess1", "scanResult.BSSID:" + scanResult.BSSID);
                         viewController.closeInputPasswordDialog();
                         WifiConfig.getInstance(mContext).removePasswd(scanResult.SSID);
-                        WifiAdmin.getInstance(mContext).removeConfiguredWifi(WifiConfig.getInstance(mContext).getSaveWifiId(scanResult.BSSID),false);
+                        WifiAdmin.getInstance(mContext).removeWifi("\"" + scanResult.SSID + "\"");
                     }
 
                     @Override
@@ -151,6 +150,26 @@ public class PresenterImpl implements IPresenter {
         }
 
     }
+
+    private void connectWifi(String ssid, String password, String secrity) {
+        int netId = WifiAdmin.getInstance(mContext).IsConfiguration("\"" + ssid + "\"");
+        if (netId != -1) {
+            Log.d("connectWifi", "justId");
+            WifiAdmin.getInstance(mContext).ConnectWifi(netId);
+        } else {
+            if (TextUtils.isEmpty(secrity)) {
+                Log.d("connectWifi", "nopsd");
+                WifiAdmin.getInstance(mContext).addNetwork(WifiAdmin.getInstance(mContext).createWifiInfo(ssid, "", 1));
+            } else if (secrity.equals("wpa")) {
+                Log.d("connectWifi", "wpa");
+                WifiAdmin.getInstance(mContext).addNetwork(WifiAdmin.getInstance(mContext).createWifiInfo(ssid, password, 3));
+            } else if (secrity.equals("wep")) {
+                Log.d("connectWifi", "wep");
+                WifiAdmin.getInstance(mContext).addNetwork(WifiAdmin.getInstance(mContext).createWifiInfo(ssid, password, 2));
+            }
+        }
+    }
+
 
     public void updateData() {
         WifiAdmin.getInstance(mContext).updateConfigure();
@@ -167,9 +186,13 @@ public class PresenterImpl implements IPresenter {
                 current_password = password;
                 Log.d("isSuccess1", "scanResult.SSID:" + ssid);
                 Log.d("isSuccess1", "passward:" + password);
-                //断开现有连接
-                WifiAdmin.getInstance(mContext).removeConfiguredWifi(WifiConfig.getInstance(mContext).getSaveWifiId(ssid),true);
-                WifiAdmin.getInstance(mContext).addNetwork(WifiAdmin.getInstance(mContext).createWifiInfo(ssid, password, type));
+                int netId = WifiAdmin.getInstance(mContext).IsConfiguration("\"" + ssid + "\"");
+                if (netId != -1) {
+                    Log.d("connectWifi", "justId");
+                    WifiAdmin.getInstance(mContext).ConnectWifi(netId);
+                }else {
+                    WifiAdmin.getInstance(mContext).addNetwork(WifiAdmin.getInstance(mContext).createWifiInfo(ssid, password, type));
+                }
                 viewController.showLoadDialog();
             }
 
@@ -189,7 +212,7 @@ public class PresenterImpl implements IPresenter {
     @Override
     public void savePassword(String ssid) {
         if (ssid.equals(current_ssid))
-        WifiConfig.getInstance(mContext).savePasswd(current_ssid, current_password);
+            WifiConfig.getInstance(mContext).savePasswd(current_ssid, current_password);
     }
 
     @Override

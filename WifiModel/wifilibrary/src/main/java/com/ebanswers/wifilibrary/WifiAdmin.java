@@ -10,7 +10,6 @@ import android.util.Log;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -50,21 +49,18 @@ public class WifiAdmin {
         filterWifiLists = new ArrayList<>();
     }
 
-    /**
-     * 是否存在网络信息
-     *
-     * @param str 热点名称
-     * @return
-     */
-    private WifiConfiguration isExsits(String str) {
-        Iterator localIterator = this.mWifiManager.getConfiguredNetworks().iterator();
-        WifiConfiguration localWifiConfiguration;
-        do {
-            if (!localIterator.hasNext())
-                return null;
-            localWifiConfiguration = (WifiConfiguration) localIterator.next();
-        } while (!localWifiConfiguration.SSID.equals("\"" + str + "\""));
-        return localWifiConfiguration;
+
+    //判定指定WIFI是否已经配置好,依据WIFI的地址BSSID,返回NetId
+    public int IsConfiguration(String SSID) {
+        List<WifiConfiguration> wifiConfigList = mWifiManager.getConfiguredNetworks();
+        Log.i("IsConfiguration", String.valueOf(wifiConfigList.size()));
+        for (int i = 0; i < wifiConfigList.size(); i++) {
+            Log.i(wifiConfigList.get(i).SSID, String.valueOf(wifiConfigList.get(i).networkId));
+            if (wifiConfigList.get(i).SSID.equals(SSID)) {//地址相同
+                return wifiConfigList.get(i).networkId;
+            }
+        }
+        return -1;
     }
 
     /**
@@ -112,20 +108,61 @@ public class WifiAdmin {
         }
     }
 
-    /**
-     * 端口指定id的wifi
-     **/
-    public void disconnectWifi(int paramInt) {
-        this.mWifiManager.disableNetwork(paramInt);
-    }
 
     /**
      * 添加指定网络
      **/
     public void addNetwork(WifiConfiguration paramWifiConfiguration) {
-        int i = mWifiManager.addNetwork(paramWifiConfiguration);
-        mWifiManager.enableNetwork(i, true);
+        int id;
+        if (IsConfiguration(paramWifiConfiguration.SSID)!=-1){
+            id = mWifiManager.updateNetwork(paramWifiConfiguration);
+        }else{
+            id = mWifiManager.addNetwork(paramWifiConfiguration);
+        }
+        if (id!=-1)
+        mWifiManager.enableNetwork(id, true);
     }
+
+    //连接指定Id的WIFI
+    public boolean ConnectWifi(int wifiId) {
+        List<WifiConfiguration> wifiConfigList = mWifiManager.getConfiguredNetworks();
+        for (int i = 0; i < wifiConfigList.size(); i++) {
+            WifiConfiguration wifi = wifiConfigList.get(i);
+            if (wifi.networkId == wifiId) {
+                while (!(mWifiManager.enableNetwork(wifiId, true))) {//激活该Id，建立连接
+                    Log.i("ConnectWifi", String.valueOf(wifiConfigList.get(wifiId).status));//status:0--已经连接，1--不可连接，2--可以连接
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void disconnectWifi(int netId) {
+        mWifiManager.disableNetwork(netId);
+        mWifiManager.disconnect();
+    }
+
+
+    public void removeWifi(String ssid, int netId) {
+        int id = IsConfiguration(ssid);
+        Log.d("lishihuiId","id:"+id+",netId:"+netId);
+        if (id != -1&&id==netId) {
+            boolean flag = mWifiManager.removeNetwork(id);
+            mWifiManager.saveConfiguration();
+            Log.d("lishihuiId","flag_ssid_id:"+flag);
+        }
+    }
+    public void removeWifi(String ssid) {
+        int id = IsConfiguration(ssid);
+        Log.d("lishihuiId","id:"+id);
+        if (id != -1) {
+            boolean flag = mWifiManager.removeNetwork(id);
+            mWifiManager.saveConfiguration();
+            Log.d("lishihuiId","flag_id:"+flag);
+        }
+    }
+
 
     /**
      * 连接指定配置好的网络
@@ -163,23 +200,6 @@ public class WifiAdmin {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public boolean removeConfiguredWifi(int netId, boolean isDisconnect) {
-        boolean result = false;
-        Log.d("netId", "netId:" + netId);
-        if (netId != -1)
-            mWifiManager.disableNetwork(netId);
-        if (isDisconnect)
-            mWifiManager.disconnect();
-        if (netId != -1)
-            result = mWifiManager.removeNetwork(netId);
-        if (netId != -1)
-            mWifiManager.saveConfiguration();
-        if (netId != -1)
-            mWifiConfiguration = mWifiManager.getConfiguredNetworks();
-        return result;
-
     }
 
     /**
@@ -343,7 +363,7 @@ public class WifiAdmin {
      * 得到网络列表
      **/
     public List<ScanResult> getWifiList() {
-        return this.mWifiList;
+        return this.mWifiList = mWifiManager.getScanResults();
     }
 
     /**

@@ -1,6 +1,5 @@
 package com.ebanswers.wifimodel;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -16,10 +15,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         fragmentManager = getSupportFragmentManager();
-        StyleConfig styleConfig = new StyleConfig.Builder().setItemTextColor(Color.parseColor("#ffff00"))
-                .setTopBackGroundColor(Color.parseColor("#3F51B5"))
-                .setLayoutType(StyleConfig.TYPE2)
-                .setTopTitleColor(Color.parseColor("#FF4081")).build();
-        fragmentManager.beginTransaction().replace(R.id.id_fl_container, WifiFragment.getInstance(styleConfig)).commitAllowingStateLoss();
+//        StyleConfig styleConfig = new StyleConfig.Builder().setItemTextColor(Color.parseColor("#ffff00"))
+//                .setTopBackGroundColor(Color.parseColor("#3F51B5"))
+//                .setLayoutType(StyleConfig.TYPE2)
+//                .setTopTitleColor(Color.parseColor("#FF4081")).build();
+        fragmentManager.beginTransaction().replace(R.id.id_fl_container, WifiFragment.getInstance(StyleConfig.TYPE1_2)).commitAllowingStateLoss();
     }
 }

@@ -20,12 +20,9 @@ public class ModelControllerImpl implements WifiReceiver.WifiStateChange {
     private IPresenter mPresenter;
     private Context mContext;
 
-    public ModelControllerImpl(Context context, IPresenter presenter) {
+    public ModelControllerImpl(Context context, IPresenter presenter,List<ScanResult> mlist) {
         mContext = context;
         mPresenter = presenter;
-    }
-
-    public void setScanResultlist(List<ScanResult> mlist) {
         this.mlist = mlist;
     }
 
@@ -65,7 +62,7 @@ public class ModelControllerImpl implements WifiReceiver.WifiStateChange {
     public void updateWifiList() {
         if (mlist != null) {
             mlist.clear();
-            if (WifiAdmin.getInstance(mContext).getWifiList() != null) {
+            if (WifiAdmin.getInstance(mContext).getWifiListWithFilting() != null) {
                 mlist.addAll(WifiAdmin.getInstance(mContext).getWifiListWithFilting());
                 mPresenter.updateData();
             }

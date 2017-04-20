@@ -7,3 +7,5 @@
 /build
 /captures
 .externalNativeBuild
+/wifilibrary/local.properties
+/wifilibrary/project.properties

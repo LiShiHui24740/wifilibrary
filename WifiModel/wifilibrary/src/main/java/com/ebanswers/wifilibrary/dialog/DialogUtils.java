@@ -48,7 +48,7 @@ public class DialogUtils {
         int width = activity.getResources().getDisplayMetrics().widthPixels;
         int height = activity.getResources().getDisplayMetrics().heightPixels;
         if (width > height) {
-            window.setLayout(width * 2 / 5, WindowManager.LayoutParams.WRAP_CONTENT);
+            window.setLayout(width/ 2, WindowManager.LayoutParams.WRAP_CONTENT);
         } else {
             window.setLayout(width - 80, WindowManager.LayoutParams.WRAP_CONTENT);
         }
@@ -146,7 +146,7 @@ public class DialogUtils {
         int width = activity.getResources().getDisplayMetrics().widthPixels;
         int height = activity.getResources().getDisplayMetrics().heightPixels;
         if (width > height) {
-            window.setLayout(width * 1 / 3, WindowManager.LayoutParams.WRAP_CONTENT);
+            window.setLayout(width/3, WindowManager.LayoutParams.WRAP_CONTENT);
         } else {
             window.setLayout(width - 80, WindowManager.LayoutParams.WRAP_CONTENT);
         }
@@ -170,7 +170,7 @@ public class DialogUtils {
         int width = activity.getResources().getDisplayMetrics().widthPixels;
         int height = activity.getResources().getDisplayMetrics().heightPixels;
         if (width > height) {
-            window.setLayout(width * 1 / 3, WindowManager.LayoutParams.WRAP_CONTENT);
+            window.setLayout(width/2, WindowManager.LayoutParams.WRAP_CONTENT);
         } else {
             window.setLayout(width - 80, WindowManager.LayoutParams.WRAP_CONTENT);
         }
@@ -215,7 +215,7 @@ public class DialogUtils {
         int width = activity.getResources().getDisplayMetrics().widthPixels;
         int height = activity.getResources().getDisplayMetrics().heightPixels;
         if (width > height) {
-            window.setLayout(width * 2 / 5, WindowManager.LayoutParams.WRAP_CONTENT);
+            window.setLayout(width/ 2, WindowManager.LayoutParams.WRAP_CONTENT);
         } else {
             window.setLayout(width - 80, WindowManager.LayoutParams.WRAP_CONTENT);
         }
@@ -248,7 +248,7 @@ public class DialogUtils {
                 } else if (checkedId == R.id.id_rb_wep) {
                     radioGroup.setTag(2);
                     psd_ll.setVisibility(View.VISIBLE);
-                } else if (checkedId == R.id.id_rb_wep) {
+                } else if (checkedId == R.id.id_rb_wpa) {
                     radioGroup.setTag(3);
                     psd_ll.setVisibility(View.VISIBLE);
                 }

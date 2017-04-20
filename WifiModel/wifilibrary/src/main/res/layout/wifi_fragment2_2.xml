@@ -53,7 +53,7 @@
             android:verticalSpacing="10dp"
             />
 
-        <include layout="@layout/wifi_adapter_footer_layout"/>
+        <include layout="@layout/wifi_adapter_footer_layout2"/>
     </LinearLayout>
 
 

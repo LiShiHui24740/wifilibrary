@@ -65,6 +65,7 @@
                 android:layout_weight="1"
                 android:checked="true"
                 android:text="开放"
+                android:textColor="#1a1a1a"
                 />
 
             <RadioButton
@@ -73,6 +74,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="WEP"
+                android:textColor="#1a1a1a"
                 android:gravity="center_vertical"
                 />
 
@@ -82,6 +84,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="WPA"
+                android:textColor="#1a1a1a"
                 android:gravity="center_vertical"
                 />
         </RadioGroup>
@@ -123,7 +126,7 @@
             />
     </LinearLayout>
 
-    <TextView
+    <View
         android:layout_width="match_parent"
         android:layout_height="1px"
         android:background="#55aaaaaa"
@@ -146,7 +149,7 @@
             android:enabled="false"
             android:background="@drawable/selector_bg_left_pressed"
             />
-        <TextView
+        <View
             android:layout_width="1px"
             android:layout_height="match_parent"
             android:background="#55aaaaaa"

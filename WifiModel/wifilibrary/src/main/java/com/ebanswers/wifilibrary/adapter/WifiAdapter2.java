@@ -14,7 +14,6 @@ import android.widget.TextView;
 import com.ebanswers.wifilibrary.NetUtils;
 import com.ebanswers.wifilibrary.R;
 import com.ebanswers.wifilibrary.WifiAdmin;
-import com.ebanswers.wifilibrary.WifiConfig;
 import com.ebanswers.wifilibrary.p.IPresenter;
 import com.ebanswers.wifilibrary.v.IViewController;
 
@@ -69,8 +68,8 @@ public class WifiAdapter2 extends BaseAdapter {
         if (result.BSSID.equals(WifiAdmin.getInstance(parent.getContext()).getBSSID()) && NetUtils.isWifi(parent.getContext())) {
             Log.d("netId", "result.BSSID：" + result.BSSID);
             Log.d("netId", "WifiAdmin.getInstance(parent.getContext()).getNetworkId()：" + WifiAdmin.getInstance(parent.getContext()).getNetworkId());
-            WifiConfig.getInstance(parent.getContext()).setBssid(result.BSSID);
-            WifiConfig.getInstance(parent.getContext()).setSaveWifiId(result.BSSID, WifiAdmin.getInstance(parent.getContext()).getNetworkId());
+//            WifiConfig.getInstance(parent.getContext()).setSsid(result.SSID);
+//            WifiConfig.getInstance(parent.getContext()).setSaveWifiId(result.SSID, WifiAdmin.getInstance(parent.getContext()).getNetworkId());
             mPresenter.savePassword(result.SSID);
             viewHolder.connected.setVisibility(View.VISIBLE);
         } else {
