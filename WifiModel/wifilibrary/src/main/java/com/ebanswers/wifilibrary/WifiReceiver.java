@@ -4,7 +4,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.NetworkInfo;
+import android.net.wifi.SupplicantState;
+import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,57 +23,43 @@ public class WifiReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION)) {
+            SupplicantState supplicantState = (SupplicantState) intent.getParcelableExtra(WifiManager.EXTRA_NEW_STATE);
+            Log.d("lishihui_DetailedState", "SupplicantState2:" + supplicantState);
+            NetworkInfo.DetailedState state = WifiInfo.getDetailedStateOf(supplicantState);
+            Log.d("lishihui_DetailedState", "DetailedState:" + state);
             int error = intent.getIntExtra(WifiManager.EXTRA_SUPPLICANT_ERROR, -1);
             if (error == WifiManager.ERROR_AUTHENTICATING) {
-                wifiStatus(WIFI_FAIL, "密码错误");
+                wifiStatus(WIFI_FAIL, "身份认证失败");
             }
+            switch (supplicantState) {
+                case DISCONNECTED:
+                    wifiStatus(WIFI_DISCONNECT);
+                    break;
+            }
+
         } else if (intent.getAction().equals(WifiManager.RSSI_CHANGED_ACTION)) {
             wifiStatus(WIFI_UPDATE);
         } else if (intent.getAction().equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)) {// wifi连接上与否
-            System.out.println("网络状态改变");
             wifiStatus(WIFI_UPDATE);
             NetworkInfo info = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
-            if (info.getState() == NetworkInfo.State.DISCONNECTED) {
-                switch (info.getDetailedState()) {
-                    case DISCONNECTED:
-                        System.out.println("wifi网络连接断开");
-                        wifiStatus(WIFI_DISCONNECT);
-                        break;
-                    case FAILED:
-                        //WARNING: 这个好像并不会有这个广播出现
-                        System.out.println("wifi连接失败");
-                        wifiStatus(WIFI_DISCONNECT);
-                        break;
-                    default:
-                        System.out.println("其他失败广播：" + info.getDetailedState().name());
-                        break;
-                }
-            } else if (info.getState() == NetworkInfo.State.DISCONNECTING) {
-                System.out.println("wifi正在断开连接");
-            } else if (info.getState() == NetworkInfo.State.CONNECTED) {
+            if (info.getState().equals(NetworkInfo.State.CONNECTED)) {
                 System.out.println("wifi网络连接成功");
                 wifiStatus(WIFI_CONNECT);
-            } else if (info.getState() == NetworkInfo.State.CONNECTING) {
+            } else if (info.getState().equals(NetworkInfo.State.CONNECTING)) {
+                System.out.println("wifi正在连接");
                 wifiStatus(WIFI_OPENING);
-            } else if (info.getState() == NetworkInfo.State.SUSPENDED) {
-                System.out.println("wifi连接暂停");
-            } else if (info.getState() == NetworkInfo.State.UNKNOWN) {
-                System.out.println("wifi出错，未知原因");
             }
-
         } else if (intent.getAction().equals(WifiManager.WIFI_STATE_CHANGED_ACTION)) {// wifi打开与否
-            int wifistate = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE, WifiManager.WIFI_STATE_DISABLED);
-            if (wifistate == WifiManager.WIFI_STATE_DISABLED) {
+            int wifi_state = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE, WifiManager.WIFI_STATE_DISABLED);
+            if (wifi_state == WifiManager.WIFI_STATE_DISABLED) {
                 System.out.println("系统关闭wifi");
                 wifiStatus(WIFI_CLOSE);
-            } else if (wifistate == WifiManager.WIFI_STATE_ENABLED) {
+            } else if (wifi_state == WifiManager.WIFI_STATE_ENABLED) {
                 System.out.println("系统开启wifi");
                 wifiStatus(WIFI_OPEN);
-            } else if (wifistate == WifiManager.WIFI_STATE_ENABLING) {
+            } else if (wifi_state == WifiManager.WIFI_STATE_ENABLING) {
                 System.out.println("系统正在开启wifi");
                 wifiStatus(WIFI_OPENING);
-            } else {
-                System.out.println("wifi处于其他状态：" + wifistate);
             }
         } else if (intent.getAction().equals(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)) {// wifi扫描结果可得
             System.out.println("Wifi扫描结果已得");
@@ -141,7 +130,6 @@ public class WifiReceiver extends BroadcastReceiver {
      */
     private void wifiStatus(int wifiTag, String... strings) {
         if (mWifiStateChanges != null) {
-            //            LogUtils.d(TAG + " --> wifiStatus(): mWifiStateChanges = " + mWifiStateChanges.toString() + " mWifiStateChanges.size = " + mWifiStateChanges.size());
             for (WifiStateChange wifiStateChange : mWifiStateChanges) {
                 switch (wifiTag) {
                     case WIFI_OPEN:
@@ -160,8 +148,8 @@ public class WifiReceiver extends BroadcastReceiver {
                         wifiStateChange.failWifi(strings[0]);
                         break;
                     case WIFI_DISCONNECT:
-                        wifiStateChange.disconnectWifi();
                         wifiStateChange.updateWifiList();
+                        wifiStateChange.disconnectWifi();
                         break;
                     case WIFI_CONNECT:
                         wifiStateChange.updateWifiList();

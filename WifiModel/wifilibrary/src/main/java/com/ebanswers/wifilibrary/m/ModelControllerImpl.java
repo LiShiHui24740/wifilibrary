@@ -55,7 +55,7 @@ public class ModelControllerImpl implements WifiReceiver.WifiStateChange {
 
     @Override
     public void disconnectWifi() {
-        //        mPresenter.getViewController().closeLoadDialog();
+        //mPresenter.getViewController().closeLoadDialog();
     }
 
     @Override

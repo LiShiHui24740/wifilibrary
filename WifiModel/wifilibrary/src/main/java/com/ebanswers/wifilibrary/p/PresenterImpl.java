@@ -42,6 +42,7 @@ public class PresenterImpl implements IPresenter {
         intentFilter.addAction("android.net.wifi.WIFI_STATE_CHANGED");
         intentFilter.addAction("android.net.wifi.SCAN_RESULTS");
         intentFilter.addAction("android.net.wifi.supplicant.STATE_CHANGE");
+        intentFilter.addAction("android.net.wifi.RSSI_CHANGED");
         mContext.registerReceiver(wifiReceiver, intentFilter);
     }
 
@@ -159,13 +160,13 @@ public class PresenterImpl implements IPresenter {
         } else {
             if (TextUtils.isEmpty(secrity)) {
                 Log.d("connectWifi", "nopsd");
-                WifiAdmin.getInstance(mContext).addNetwork(WifiAdmin.getInstance(mContext).createWifiInfo(ssid, "", 1));
+                WifiAdmin.getInstance(mContext).addNetwork(WifiAdmin.getInstance(mContext).createWifiInfo(ssid, "", 1),true);
             } else if (secrity.equals("wpa")) {
                 Log.d("connectWifi", "wpa");
-                WifiAdmin.getInstance(mContext).addNetwork(WifiAdmin.getInstance(mContext).createWifiInfo(ssid, password, 3));
+                WifiAdmin.getInstance(mContext).addNetwork(WifiAdmin.getInstance(mContext).createWifiInfo(ssid, password, 3),true);
             } else if (secrity.equals("wep")) {
                 Log.d("connectWifi", "wep");
-                WifiAdmin.getInstance(mContext).addNetwork(WifiAdmin.getInstance(mContext).createWifiInfo(ssid, password, 2));
+                WifiAdmin.getInstance(mContext).addNetwork(WifiAdmin.getInstance(mContext).createWifiInfo(ssid, password, 2),true);
             }
         }
     }
@@ -191,7 +192,7 @@ public class PresenterImpl implements IPresenter {
                     Log.d("connectWifi", "justId");
                     WifiAdmin.getInstance(mContext).ConnectWifi(netId);
                 }else {
-                    WifiAdmin.getInstance(mContext).addNetwork(WifiAdmin.getInstance(mContext).createWifiInfo(ssid, password, type));
+                    WifiAdmin.getInstance(mContext).addNetwork(WifiAdmin.getInstance(mContext).createWifiInfo(ssid, password, type),true);
                 }
                 viewController.showLoadDialog();
             }

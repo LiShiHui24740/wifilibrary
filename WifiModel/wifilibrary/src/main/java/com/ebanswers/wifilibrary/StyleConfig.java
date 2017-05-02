@@ -12,6 +12,8 @@ public class StyleConfig {
     public static final int TYPE1_2= 0x02;//listView,添加wifi和手动搜索为水平排布
     public static final int TYPE2_1= 0x03;//grideView,添加wifi和手动搜索为水平排布
     public static final int TYPE2_2= 0x04;//grideView,添加wifi和手动搜索为水平排布
+    public static final int TYPE1_NONE = 0x05;//listview,添加wifi和手动搜索为不可见
+    public static final int TYPE2_NONE = 0x06;//grideView,添加wifi和手动搜索为不可见
     private StyleConfig(Bundle bundle) {
         mBundle = bundle;
     }

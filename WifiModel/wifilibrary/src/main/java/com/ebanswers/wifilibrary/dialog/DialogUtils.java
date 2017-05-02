@@ -64,12 +64,14 @@ public class DialogUtils {
         name.setText(scanResult.SSID);
         Log.d("lishihui_wifi","ssid:"+scanResult.SSID);
         Log.d("lishihui_wifi","netId:"+WifiAdmin.getInstance(activity).IsConfiguration("\""+scanResult.SSID+"\""));
-        if (WifiAdmin.getInstance(activity).IsConfiguration("\""+scanResult.SSID+"\"") != -1) {
+        if (WifiAdmin.getInstance(activity).IsConfiguration("\""+scanResult.SSID+"\"") != -1||!TextUtils.isEmpty(WifiConfig.getInstance(activity).getPasswd(scanResult.SSID))) {
             password.setVisibility(View.GONE);
             showPassWord.setVisibility(View.GONE);
+            connect.setEnabled(true);
         } else {
             password.setVisibility(View.VISIBLE);
             showPassWord.setVisibility(View.VISIBLE);
+            connect.setEnabled(false);
         }
         password.addTextChangedListener(new TextWatcher() {
             @Override

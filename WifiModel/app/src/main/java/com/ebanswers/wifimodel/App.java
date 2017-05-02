@@ -5,6 +5,7 @@ import android.app.Application;
 import com.tencent.bugly.crashreport.CrashReport;
 
 /**
+ * @author
  * Created by lishihui on 2017/4/18.
  */
 

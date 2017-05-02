@@ -4,6 +4,7 @@
               android:layout_height="wrap_content"
               android:gravity="center_vertical"
               android:orientation="horizontal"
+              android:id="@+id/id_ll_wifi_footer2"
     >
 
     <LinearLayout

@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">WifiLibrary</string>
+    <string name="scaning_wifi">正在扫描Wifi...</string>
+    <string name="wifi_closed">Wifi未打开</string>
 </resources>

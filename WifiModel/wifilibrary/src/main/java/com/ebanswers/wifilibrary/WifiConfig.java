@@ -48,28 +48,6 @@ public class WifiConfig {
     }
 
     /**
-     * 保存着的Wifi
-     */
-//    public void setSaveWifiId(String SSID,int wifiNetId) {
-//        SharedPreferences.Editor edit = sharedPrefs.edit();
-//        edit.putInt(SSID+"wifi", wifiNetId);
-//        edit.commit();
-//    }
-//
-//    public int getSaveWifiId(String SSID) {
-//        return sharedPrefs.getInt(SSID+"wifi", -1);
-//    }
-//
-//    public void setSsid(String SSID){
-//        SharedPreferences.Editor edit = sharedPrefs.edit();
-//        edit.putString("ssid_wifi", SSID);
-//        edit.commit();
-//    }
-//
-//    public String getSsid(){
-//        return sharedPrefs.getString("ssid_wifi", "");
-//    }
-    /**
      * 获取已保存的Wifi密码
      *
      * @param ssid wifi名称

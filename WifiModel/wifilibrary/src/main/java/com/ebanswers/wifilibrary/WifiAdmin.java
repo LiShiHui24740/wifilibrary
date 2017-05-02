@@ -111,14 +111,16 @@ public class WifiAdmin {
     /**
      * 添加指定网络
      **/
-    public void addNetwork(WifiConfiguration paramWifiConfiguration) {
+    public void addNetwork(WifiConfiguration paramWifiConfiguration, boolean isConnect) {
         int id = IsConfiguration(paramWifiConfiguration.SSID);
         if (id == -1) {
             id = mWifiManager.addNetwork(paramWifiConfiguration);
             Log.d("connectWifi", "updateNetwork:" + id);
         }
-        if (id != -1)
+        if (id != -1 && isConnect) {
             mWifiManager.enableNetwork(id, true);
+        }
+
     }
 
     //连接指定Id的WIFI
@@ -406,8 +408,8 @@ public class WifiAdmin {
             for (ScanResult r : filterWifiLists) {
                 if (r.SSID.equals(result.SSID)) {
                     tf = true;
-                    int level1 = WifiManager.calculateSignalLevel(r.level, 5);
-                    int level2 = WifiManager.calculateSignalLevel(result.level, 5);
+                    int level1 = WifiManager.calculateSignalLevel(r.level, 4);
+                    int level2 = WifiManager.calculateSignalLevel(result.level, 4);
                     if (level1 < level2) {
                         removeList.add(r);
                         addList.add(result);

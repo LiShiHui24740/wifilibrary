@@ -2,6 +2,7 @@ package com.ebanswers.wifilibrary.adapter;
 
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -82,36 +83,52 @@ public class WifiAdapter2 extends BaseAdapter {
             viewHolder.name.setTextColor(textColor);
         }
         viewHolder.name.setText(result.SSID);
-        String security = result.capabilities.toLowerCase();
+        String security = "" ;
+        if (!TextUtils.isEmpty(result.capabilities))
+            security = result.capabilities.toLowerCase();
         int signalLevel = WifiManager.calculateSignalLevel(result.level, 4);
         viewHolder.wifi.setVisibility(View.VISIBLE);
         if (security.contains("wpa") || security.contains("wep")) {
             switch (signalLevel) {
+                case -1:
+                    viewHolder.wifi.setVisibility(View.INVISIBLE);
+                    break;
                 case 0:
+                    viewHolder.wifi.setVisibility(View.VISIBLE);
                     viewHolder.wifi.setImageResource(R.drawable.ic_wifi_lock_1);
                     break;
                 case 1:
+                    viewHolder.wifi.setVisibility(View.VISIBLE);
                     viewHolder.wifi.setImageResource(R.drawable.ic_wifi_lock_2);
                     break;
                 case 2:
+                    viewHolder.wifi.setVisibility(View.VISIBLE);
                     viewHolder.wifi.setImageResource(R.drawable.ic_wifi_lock_3);
                     break;
                 case 3:
+                    viewHolder.wifi.setVisibility(View.VISIBLE);
                     viewHolder.wifi.setImageResource(R.drawable.ic_wifi_lock_4);
                     break;
             }
         } else {
             switch (signalLevel) {
+                case -1:
+                    viewHolder.wifi.setVisibility(View.INVISIBLE);
+                    break;
                 case 0:
+                    viewHolder.wifi.setVisibility(View.VISIBLE);
                     viewHolder.wifi.setImageResource(R.drawable.ic_wifi_1);
                     break;
                 case 1:
+                    viewHolder.wifi.setVisibility(View.VISIBLE);
                     viewHolder.wifi.setImageResource(R.drawable.ic_wifi_2);
                     break;
                 case 2:
+                    viewHolder.wifi.setVisibility(View.VISIBLE);
                     viewHolder.wifi.setImageResource(R.drawable.ic_wifi_3);
                     break;
                 case 3:
+                    viewHolder.wifi.setVisibility(View.VISIBLE);
                     viewHolder.wifi.setImageResource(R.drawable.ic_wifi_4);
                     break;
             }
