@@ -13,7 +13,7 @@ compile 'com.ebanswers:wifilibrary:1.1.5'
 ```
 ## 获取到wififragment实例，参数为样式；
 
-## 在MainActicity中使用：
+# 例如在MainActicity中使用：
 ```
 public class MainActivity extends AppCompatActivity {
 
