@@ -23,4 +23,5 @@ public interface IViewController {
     void closeToggle();
     void showOpenTip();
     void showCloseTip();
+    boolean getWifiIsChecked();
 }

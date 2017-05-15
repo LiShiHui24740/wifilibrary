@@ -40,7 +40,7 @@ public class ModelControllerImpl implements WifiReceiver.WifiStateChange {
      * wifi正在连接中
      */
     @Override
-    public void openingWifi() {
+    public void connectingWifi() {
         Log.d("loadDialog", "openingWifi");
         mPresenter.getViewController().showLoadDialog();
     }

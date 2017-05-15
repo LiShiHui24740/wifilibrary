@@ -351,6 +351,11 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
     }
 
     @Override
+    public boolean getWifiIsChecked() {
+        return mWifiToggle.isChecked();
+    }
+
+    @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         if (isChecked) {
             openToggle();

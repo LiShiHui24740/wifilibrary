@@ -47,7 +47,7 @@ public class WifiReceiver extends BroadcastReceiver {
                 wifiStatus(WIFI_CONNECT);
             } else if (info.getState().equals(NetworkInfo.State.CONNECTING)) {
                 System.out.println("wifi正在连接");
-                wifiStatus(WIFI_OPENING);
+                wifiStatus(WIFI_CONNECTTING);
             }
         } else if (intent.getAction().equals(WifiManager.WIFI_STATE_CHANGED_ACTION)) {// wifi打开与否
             int wifi_state = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE, WifiManager.WIFI_STATE_DISABLED);
@@ -57,9 +57,6 @@ public class WifiReceiver extends BroadcastReceiver {
             } else if (wifi_state == WifiManager.WIFI_STATE_ENABLED) {
                 System.out.println("系统开启wifi");
                 wifiStatus(WIFI_OPEN);
-            } else if (wifi_state == WifiManager.WIFI_STATE_ENABLING) {
-                System.out.println("系统正在开启wifi");
-                wifiStatus(WIFI_OPENING);
             }
         } else if (intent.getAction().equals(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)) {// wifi扫描结果可得
             System.out.println("Wifi扫描结果已得");
@@ -78,7 +75,7 @@ public class WifiReceiver extends BroadcastReceiver {
     /**
      * wifi正在打开
      */
-    private static final int WIFI_OPENING = 0x03;
+    private static final int WIFI_CONNECTTING = 0x03;
     /**
      * wifi结果刷新
      */
@@ -138,8 +135,8 @@ public class WifiReceiver extends BroadcastReceiver {
                     case WIFI_CLOSE:
                         wifiStateChange.closeWifi();
                         break;
-                    case WIFI_OPENING:
-                        wifiStateChange.openingWifi();
+                    case WIFI_CONNECTTING:
+                        wifiStateChange.connectingWifi();
                         break;
                     case WIFI_UPDATE:
                         wifiStateChange.updateWifiList();
@@ -169,7 +166,7 @@ public class WifiReceiver extends BroadcastReceiver {
         void closeWifi();
 
         //正在打开wifi
-        void openingWifi();
+        void connectingWifi();
 
         //连接成功
         void connectWifi();
