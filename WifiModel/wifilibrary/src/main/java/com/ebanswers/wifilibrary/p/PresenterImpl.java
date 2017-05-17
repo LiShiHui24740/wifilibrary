@@ -48,7 +48,7 @@ public class PresenterImpl implements IPresenter {
 
     @Override
     public void init(final List<ScanResult> list) {
-        Log.d("lishihui_open","open:"+WifiAdmin.getInstance(mContext).isWifiEnable());
+//        Log.d("lishihui_open","open:"+WifiAdmin.getInstance(mContext).isWifiEnable());
         if (WifiAdmin.getInstance(mContext).isWifiEnable()||viewController.getWifiIsChecked()) {
             viewController.openToggle();
             openWifiAndScan(list);

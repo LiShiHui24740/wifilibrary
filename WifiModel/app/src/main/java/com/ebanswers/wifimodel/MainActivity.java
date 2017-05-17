@@ -18,11 +18,8 @@ public class MainActivity extends AppCompatActivity {
 
         fragmentManager = getSupportFragmentManager();
 
-        StyleConfig styleConfig = new StyleConfig.Builder().setItemTextColor(Color.parseColor("#ffff00"))
-                .setTopBackGroundColor(Color.parseColor("#3F51B5"))
-                .setLayoutType(StyleConfig.TYPE1_2)
-                .setTopTitleColor(Color.parseColor("#FF4081")).build();
-
+        StyleConfig styleConfig = new StyleConfig.Builder()
+                .setLayoutType(StyleConfig.TYPE1_NONE).build();
         fragmentManager.beginTransaction().replace(R.id.id_fl_container, WifiFragment.getInstance(styleConfig)).commitAllowingStateLoss();
     }
 }

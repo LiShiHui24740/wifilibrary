@@ -121,7 +121,7 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
     private void initData() {
         mListScanResult = new ArrayList<>();
         mPresenterImpl = new PresenterImpl(mContext, this, mListScanResult);
-        if (layout_type == StyleConfig.TYPE1_1 || layout_type == StyleConfig.TYPE1_2) {
+        if (layout_type == StyleConfig.TYPE1_1 || layout_type == StyleConfig.TYPE1_2||layout_type==TYPE1_NONE) {
             mWifiAdapter = new WifiAdapter(mListScanResult, item_text_size, item_text_color, this, mPresenterImpl);
             mListView.setAdapter(mWifiAdapter);
             mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -132,7 +132,7 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
                 }
             });
 
-        } else if (layout_type == StyleConfig.TYPE2_1 || layout_type == StyleConfig.TYPE2_2) {
+        } else if (layout_type == StyleConfig.TYPE2_1 || layout_type == StyleConfig.TYPE2_2||layout_type==TYPE2_NONE) {
             mWifiAdapter2 = new WifiAdapter2(mListScanResult, item_text_size, item_text_color, this, mPresenterImpl);
             mGridview.setAdapter(mWifiAdapter2);
             mGridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -183,7 +183,7 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
             rl_title_top_bg.setBackgroundColor(top_bg_color);
         }
         RelativeLayout type1_bg_color_rl;
-        if (layout_type == StyleConfig.TYPE1_1 || layout_type == StyleConfig.TYPE1_2) {
+        if (layout_type == StyleConfig.TYPE1_1 || layout_type == StyleConfig.TYPE1_2||layout_type==StyleConfig.TYPE1_NONE) {
             mTip = (TextView) mContentView.findViewById(R.id.id_tv_wifi_toggle_tip);
             mListView = (ListView) mContentView.findViewById(R.id.id_lv_wifi_list);
             type1_bg_color_rl = (RelativeLayout) mContentView.findViewById(R.id.id_rl1_bg);
@@ -193,7 +193,7 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
                 type1_bg_color_rl.setBackgroundColor(bg_color);
             }
 
-        } else if (layout_type == StyleConfig.TYPE2_1 || layout_type == StyleConfig.TYPE2_2) {
+        } else if (layout_type == StyleConfig.TYPE2_1 || layout_type == StyleConfig.TYPE2_2||layout_type==StyleConfig.TYPE2_NONE) {
             mTip = (TextView) mContentView.findViewById(R.id.id_tv_wifi_toggle2_tip);
             mGridview = (GridView) mContentView.findViewById(R.id.id_gv_wifi2_list);
             RelativeLayout type2_bg_color_rl = (RelativeLayout) mContentView.findViewById(R.id.id_rl2_bg);
@@ -221,11 +221,11 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
         if (mListScanResult.size() > 0) {
             mTip.setVisibility(View.GONE);
         }
-        if (layout_type == StyleConfig.TYPE1_1 || layout_type == StyleConfig.TYPE1_2) {
+        if (layout_type == StyleConfig.TYPE1_1 || layout_type == StyleConfig.TYPE1_2||layout_type==StyleConfig.TYPE1_NONE) {
             mListView.setVisibility(View.VISIBLE);
             mWifiAdapter.notifyDataSetChanged();
             mListView.smoothScrollToPosition(0);
-        } else if (layout_type == StyleConfig.TYPE2_1 || layout_type == StyleConfig.TYPE2_2) {
+        } else if (layout_type == StyleConfig.TYPE2_1 || layout_type == StyleConfig.TYPE2_2||layout_type==StyleConfig.TYPE2_NONE) {
             mGridview.setVisibility(View.VISIBLE);
             mWifiAdapter2.notifyDataSetChanged();
             mGridview.smoothScrollToPosition(0);
@@ -326,9 +326,9 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
 
     @Override
     public void showOpenTip() {
-        if (layout_type == StyleConfig.TYPE1_1 || layout_type == StyleConfig.TYPE1_2) {
+        if (layout_type == StyleConfig.TYPE1_1 || layout_type == StyleConfig.TYPE1_2||layout_type==StyleConfig.TYPE1_NONE) {
             mListView.setVisibility(View.INVISIBLE);
-        } else if (layout_type == StyleConfig.TYPE2_1 || layout_type == StyleConfig.TYPE2_2) {
+        } else if (layout_type == StyleConfig.TYPE2_1 || layout_type == StyleConfig.TYPE2_2||layout_type==StyleConfig.TYPE2_NONE) {
             mGridview.setVisibility(View.INVISIBLE);
         } else {
             mListView.setVisibility(View.INVISIBLE);
@@ -339,9 +339,9 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
 
     @Override
     public void showCloseTip() {
-        if (layout_type == StyleConfig.TYPE1_1 || layout_type == StyleConfig.TYPE1_2) {
+        if (layout_type == StyleConfig.TYPE1_1 || layout_type == StyleConfig.TYPE1_2||layout_type==StyleConfig.TYPE1_NONE) {
             mListView.setVisibility(View.INVISIBLE);
-        } else if (layout_type == StyleConfig.TYPE2_1 || layout_type == StyleConfig.TYPE2_2) {
+        } else if (layout_type == StyleConfig.TYPE2_1 || layout_type == StyleConfig.TYPE2_2||layout_type==StyleConfig.TYPE2_NONE) {
             mGridview.setVisibility(View.INVISIBLE);
         } else {
             mListView.setVisibility(View.INVISIBLE);
