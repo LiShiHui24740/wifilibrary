@@ -16,7 +16,7 @@ compile 'com.ebanswers:wifilibrary:1.2.0'
  
 ```
 
-# 例如在MainActicity中使用：
+## 例如在MainActicity中使用：
 ```
 public class MainActivity extends AppCompatActivity {
 
@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
 }
 
 ```
-# 权限添加
+## 权限添加
 ```
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
