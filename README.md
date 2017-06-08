@@ -1,4 +1,8 @@
 # wifilibrary
+## 不多说先上部分截图
+![github] (https://github.com/LiShiHui24740/wifilibrary/blob/master/WifiModel/img/wifi_1.png?raw = true)
+![github] (https://github.com/LiShiHui24740/wifilibrary/blob/master/WifiModel/img/wifi_2.png?raw = true)
+![github] (https://github.com/LiShiHui24740/wifilibrary/blob/master/WifiModel/img/wifi_3.png?raw = true)
 ## wifi库,实现了常用的wifi连接.使用在app的build.gradle中添加以下依赖：
 
 ```
