@@ -2,6 +2,7 @@ package com.ebanswers.wifilibrary.v;
 
 import android.net.wifi.ScanResult;
 
+import com.ebanswers.wifilibrary.WifiFragment;
 import com.ebanswers.wifilibrary.dialog.DialogUtils;
 
 /**
@@ -24,4 +25,5 @@ public interface IViewController {
     void showOpenTip();
     void showCloseTip();
     boolean getWifiIsChecked();
+    WifiFragment.OnConnectCallBack getOnConnectCallBack();
 }

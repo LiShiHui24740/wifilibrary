@@ -32,9 +32,9 @@ public class PresenterImpl implements IPresenter {
     private String current_ssid, current_password;
 
     public PresenterImpl(Context context, IViewController controller,List<ScanResult> list) {
-        mContext = context;
+        mContext = context.getApplicationContext();
         this.viewController = controller;
-        modelController = new ModelControllerImpl(context, this,list);
+        modelController = new ModelControllerImpl(mContext, this,list);
         WifiReceiver.bindWifiState(modelController);
         wifiReceiver = new WifiReceiver();
         IntentFilter intentFilter = new IntentFilter();
@@ -52,9 +52,15 @@ public class PresenterImpl implements IPresenter {
         if (WifiAdmin.getInstance(mContext).isWifiEnable()||viewController.getWifiIsChecked()) {
             viewController.openToggle();
             openWifiAndScan(list);
+            if (viewController.getOnConnectCallBack()!=null){
+                viewController.getOnConnectCallBack().isWifiEnable(true);
+            }
         } else {
             viewController.closeToggle();
             viewController.showCloseTip();
+            if (viewController.getOnConnectCallBack()!=null){
+                viewController.getOnConnectCallBack().isWifiEnable(false);
+            }
         }
     }
 
@@ -227,7 +233,6 @@ public class PresenterImpl implements IPresenter {
     public void destory() {
         mContext.unregisterReceiver(wifiReceiver);
         WifiConfig.destory();
-        mContext = null;
     }
 
     @Override

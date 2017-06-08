@@ -43,6 +43,9 @@ public class ModelControllerImpl implements WifiReceiver.WifiStateChange {
     public void connectingWifi() {
         Log.d("loadDialog", "openingWifi");
         mPresenter.getViewController().showLoadDialog();
+        if (mPresenter.getViewController().getOnConnectCallBack()!=null){
+            mPresenter.getViewController().getOnConnectCallBack().connectResult(mlist.get(0));
+        }
     }
 
     /**
@@ -55,7 +58,7 @@ public class ModelControllerImpl implements WifiReceiver.WifiStateChange {
 
     @Override
     public void disconnectWifi() {
-        //mPresenter.getViewController().closeLoadDialog();
+
     }
 
     @Override

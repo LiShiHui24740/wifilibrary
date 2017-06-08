@@ -35,7 +35,11 @@ public class WifiAdmin {
      */
     public static WifiAdmin getInstance(Context context) {
         if (wifiAdmin == null) {
-            wifiAdmin = new WifiAdmin(context);
+            synchronized (WifiAdmin.class){
+                if (wifiAdmin==null){
+                    wifiAdmin = new WifiAdmin(context);
+                }
+            }
         }
         return wifiAdmin;
     }
@@ -53,10 +57,11 @@ public class WifiAdmin {
     //判定指定WIFI是否已经配置好,依据WIFI的地址BSSID,返回NetId
     public int IsConfiguration(String SSID) {
         List<WifiConfiguration> wifiConfigList = mWifiManager.getConfiguredNetworks();
-        Log.i("IsConfiguration", String.valueOf(wifiConfigList.size()));
-        for (int i = 0; i < wifiConfigList.size(); i++) {
-            if (wifiConfigList.get(i).SSID.equals(SSID)) {//地址相同
-                return wifiConfigList.get(i).networkId;
+        if (wifiConfigList!=null){
+            for (int i = 0; i < wifiConfigList.size(); i++) {
+                if (wifiConfigList.get(i).SSID.equals(SSID)) {//地址相同
+                    return wifiConfigList.get(i).networkId;
+                }
             }
         }
         return -1;
@@ -401,48 +406,51 @@ public class WifiAdmin {
         filterWifiLists.clear();
         boolean tf;
         ScanResult currentResult = null;
-        for (ScanResult result : mWifiList) {
-            tf = false;
-            ArrayList<ScanResult> removeList = new ArrayList<>();
-            ArrayList<ScanResult> addList = new ArrayList<>();
-            for (ScanResult r : filterWifiLists) {
-                if (r.SSID.equals(result.SSID)) {
-                    tf = true;
-                    int level1 = WifiManager.calculateSignalLevel(r.level, 4);
-                    int level2 = WifiManager.calculateSignalLevel(result.level, 4);
-                    if (level1 < level2) {
-                        removeList.add(r);
-                        addList.add(result);
+        if (mWifiList!=null){
+            for (ScanResult result : mWifiList) {
+                tf = false;
+                ArrayList<ScanResult> removeList = new ArrayList<>();
+                ArrayList<ScanResult> addList = new ArrayList<>();
+                for (ScanResult r : filterWifiLists) {
+                    if (r.SSID.equals(result.SSID)) {
+                        tf = true;
+                        int level1 = WifiManager.calculateSignalLevel(r.level, 4);
+                        int level2 = WifiManager.calculateSignalLevel(result.level, 4);
+                        if (level1 < level2) {
+                            removeList.add(r);
+                            addList.add(result);
+                        }
+                        break;
                     }
+                }
+                if (result.BSSID.equals(getBSSID())) {
+                    currentResult = result;
+                }
+                filterWifiLists.removeAll(removeList);
+                filterWifiLists.addAll(addList);
+                if (!tf) {
+                    filterWifiLists.add(result);
+                }
+            }
+            if (currentResult != null) {
+                ArrayList<ScanResult> removeList = new ArrayList<>();
+                for (ScanResult filter : filterWifiLists) {
+                    if (filter.SSID.equals(currentResult.SSID)) {
+                        removeList.add(filter);
+                    }
+                }
+                filterWifiLists.removeAll(removeList);
+                filterWifiLists.add(currentResult);
+            }
+            for (ScanResult result : filterWifiLists) {
+                if (result.BSSID.equals(getBSSID())) {
+                    filterWifiLists.remove(result);
+                    filterWifiLists.add(0, result);
                     break;
                 }
             }
-            if (result.BSSID.equals(getBSSID())) {
-                currentResult = result;
-            }
-            filterWifiLists.removeAll(removeList);
-            filterWifiLists.addAll(addList);
-            if (!tf) {
-                filterWifiLists.add(result);
-            }
         }
-        if (currentResult != null) {
-            ArrayList<ScanResult> removeList = new ArrayList<>();
-            for (ScanResult filter : filterWifiLists) {
-                if (filter.SSID.equals(currentResult.SSID)) {
-                    removeList.add(filter);
-                }
-            }
-            filterWifiLists.removeAll(removeList);
-            filterWifiLists.add(currentResult);
-        }
-        for (ScanResult result : filterWifiLists) {
-            if (result.BSSID.equals(getBSSID())) {
-                filterWifiLists.remove(result);
-                filterWifiLists.add(0, result);
-                break;
-            }
-        }
+
         return filterWifiLists;
     }
 

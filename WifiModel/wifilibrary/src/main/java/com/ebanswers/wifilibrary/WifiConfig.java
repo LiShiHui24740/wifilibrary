@@ -18,7 +18,7 @@ public class WifiConfig {
     public static final String WIFI_AUTHENTICATE_FAILED = "wifi_authenticate_failed";
 
     private static WifiConfig instance;
-    private final SharedPreferences sharedPrefs;
+    private static SharedPreferences sharedPrefs;
 
     private WifiConfig(Context context) {
         sharedPrefs = context.getApplicationContext().getSharedPreferences("wifi_preferences", Context.MODE_PRIVATE);// .MODE_PRIVATE);
@@ -44,7 +44,7 @@ public class WifiConfig {
     public void savePasswd(String ssid, String passwd) {
         SharedPreferences.Editor edit = sharedPrefs.edit();
         edit.putString(ssid, passwd);
-        edit.commit();
+        edit.apply();
     }
 
     /**
@@ -64,7 +64,7 @@ public class WifiConfig {
     public void removePasswd(String ssid) {
         SharedPreferences.Editor edit = sharedPrefs.edit();
         edit.remove(ssid);
-        edit.commit();
+        edit.apply();
     }
 
     public static void destory(){

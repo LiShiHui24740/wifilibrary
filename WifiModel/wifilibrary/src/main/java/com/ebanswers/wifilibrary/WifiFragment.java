@@ -52,6 +52,8 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
     private PresenterImpl mPresenterImpl;
     private Dialog loadDialog, passwordDialog, disconnectDialog, addWifiDialog;
     private int layout_type = 2, top_bg_color = 0, top_bg_drawable = 0, top_title_size = 0, top_title_color = 0, item_text_size = 0, item_text_color = 0, bg_color = 0, bg_drawable = 0;
+    private OnConnectCallBack onConnectCallBack;
+
 
     public static WifiFragment getInstance(StyleConfig styleConfig) {
         WifiFragment wifiFragment = new WifiFragment();
@@ -90,6 +92,17 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
     }
 
     private WifiFragment() {
+    }
+
+
+
+    public void setOnConnectCallBack(OnConnectCallBack onConnectCallBack) {
+        this.onConnectCallBack = onConnectCallBack;
+    }
+
+    @Override
+    public OnConnectCallBack getOnConnectCallBack() {
+        return onConnectCallBack;
     }
 
     @Override
@@ -355,6 +368,7 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
         return mWifiToggle.isChecked();
     }
 
+
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         if (isChecked) {
@@ -362,11 +376,17 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
             mPresenterImpl.openWifiAndScan(mListScanResult);
             add_wifi.setVisibility(View.VISIBLE);
             search_wifi.setVisibility(View.VISIBLE);
+            if (onConnectCallBack!=null){
+                onConnectCallBack.isWifiEnable(true);
+            }
         } else {
             closeToggle();
             mPresenterImpl.closeSystemWifi();
             add_wifi.setVisibility(View.GONE);
             search_wifi.setVisibility(View.GONE);
+            if (onConnectCallBack!=null){
+                onConnectCallBack.isWifiEnable(false);
+            }
         }
     }
 
@@ -377,4 +397,8 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
         mPresenterImpl.destory();
     }
 
+    public interface OnConnectCallBack{
+        void connectResult(ScanResult scanResult);
+        void isWifiEnable(boolean flag);
+    }
 }
