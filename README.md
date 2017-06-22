@@ -1,12 +1,13 @@
 # wifilibrary
 ## 不多说先上部分截图
-![github](https://github.com/LiShiHui24740/wifilibrary/blob/master/WifiModel/img/wifi_1.png)  
-![github](https://github.com/LiShiHui24740/wifilibrary/blob/master/WifiModel/img/wifi_2.png)  
-![github](https://github.com/LiShiHui24740/wifilibrary/blob/master/WifiModel/img/wifi_3.png) 
+![github](https://github.com/LiShiHui24740/wifilibrary/blob/master/WifiModel/img/wifi_1.jpg)  
+![github](https://github.com/LiShiHui24740/wifilibrary/blob/master/WifiModel/img/wifi_2.jpg)  
+![github](https://github.com/LiShiHui24740/wifilibrary/blob/master/WifiModel/img/wifi_3.jpg) 
+![github](https://github.com/LiShiHui24740/wifilibrary/blob/master/WifiModel/img/wifi_4.jpg) 
 ## wifi库,实现了常用的wifi连接.使用在app的build.gradle中添加以下依赖：
 
 ```
-compile 'com.ebanswers:wifilibrary:1.2.0'
+compile 'com.ebanswers:wifilibrary:1.2.9'
 
 ```
 ## 使用wifi模块：
