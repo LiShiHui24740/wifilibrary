@@ -28,20 +28,19 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         
         fragmentManager = getSupportFragmentManager();
-        
-        StyleConfig styleConfig = new StyleConfig.Builder().setItemTextColor(Color.parseColor("#ffff00"))
-                .setTopBackGroundColor(Color.parseColor("#3F51B5"))
-                /**
-                 *  TYPE1_1= 0x01;//listView,添加wifi和手动搜索为垂直排布
-                 *  TYPE1_2= 0x02;//listView,添加wifi和手动搜索为水平排布
-                 *  TYPE2_1= 0x03;//grideView,添加wifi和手动搜索为水平排布
-                 *  TYPE2_2= 0x04;//grideView,添加wifi和手动搜索为水平排布
-                 *  TYPE1_NONE = 0x05;//listview,添加wifi和手动搜索为不可见
-                 *  TYPE2_NONE = 0x06;//grideView,添加wifi和手动搜索为不可见
-                 */
+        /**
+         *  TYPE1_1= 0x01;//listView,添加wifi和手动搜索为垂直排布
+         *  TYPE1_2= 0x02;//listView,添加wifi和手动搜索为水平排布
+         *  TYPE2_1= 0x03;//grideView,添加wifi和手动搜索为水平排布
+         *  TYPE2_2= 0x04;//grideView,添加wifi和手动搜索为水平排布
+         *  TYPE1_NONE = 0x05;//listview,添加wifi和手动搜索为不可见
+         *  TYPE2_NONE = 0x06;//grideView,添加wifi和手动搜索为不可见
+         */
+       StyleConfig styleConfig = new StyleConfig.Builder()
                 .setLayoutType(StyleConfig.TYPE1_2)
-                .setTopTitleColor(Color.parseColor("#FF4081")).build();
-        
+                .setBackGroundColor(Color.parseColor("#161B21"))
+                .setItemTextColor(Color.parseColor("#767C78"))
+                .build();
         fragmentManager.beginTransaction().replace(R.id.id_fl_container, WifiFragment.getInstance(styleConfig)).commitAllowingStateLoss();
     }
 }
