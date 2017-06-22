@@ -3,6 +3,7 @@ package com.ebanswers.wifilibrary;
 import android.os.Bundle;
 
 /**
+ * @author
  * Created by lishihui on 2017/4/18.
  */
 
@@ -68,8 +69,23 @@ public class StyleConfig {
             return this;
         }
 
+        public Builder setBackIsVisisble(boolean isVisisble){
+            bundle.putBoolean("backIsVisisble", isVisisble);
+            return this;
+        }
+
+        public Builder setBackDrawableId(int id){
+            bundle.putInt("backDrawableId", id);
+            return this;
+        }
+
+
         public StyleConfig build() {
             return new StyleConfig(bundle);
         }
+    }
+
+    public interface OnBackClickListener{
+        void onClick();
     }
 }

@@ -12,7 +12,6 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -62,8 +61,6 @@ public class DialogUtils {
         final TextView forget = (TextView) view.findViewById(R.id.id_tv_dialog_forget);
         final TextView close = (TextView) view.findViewById(R.id.id_tv_dialog_close);
         name.setText(scanResult.SSID);
-        Log.d("lishihui_wifi","ssid:"+scanResult.SSID);
-        Log.d("lishihui_wifi","netId:"+WifiAdmin.getInstance(activity).IsConfiguration("\""+scanResult.SSID+"\""));
         if (WifiAdmin.getInstance(activity).IsConfiguration("\""+scanResult.SSID+"\"") != -1||!TextUtils.isEmpty(WifiConfig.getInstance(activity).getPasswd(scanResult.SSID))) {
             password.setVisibility(View.GONE);
             showPassWord.setVisibility(View.GONE);
@@ -159,7 +156,7 @@ public class DialogUtils {
         int width = activity.getResources().getDisplayMetrics().widthPixels;
         int height = activity.getResources().getDisplayMetrics().heightPixels;
         if (width > height) {
-            window.setLayout(width / 3, WindowManager.LayoutParams.WRAP_CONTENT);
+            window.setLayout(width / 2, WindowManager.LayoutParams.WRAP_CONTENT);
         } else {
             window.setLayout(width - 80, WindowManager.LayoutParams.WRAP_CONTENT);
         }

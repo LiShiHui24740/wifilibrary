@@ -31,10 +31,10 @@ public class PresenterImpl implements IPresenter {
     private Executor threadPool = Executors.newCachedThreadPool();
     private String current_ssid, current_password;
 
-    public PresenterImpl(Context context, IViewController controller,List<ScanResult> list) {
+    public PresenterImpl(Context context, IViewController controller, List<ScanResult> list) {
         mContext = context.getApplicationContext();
         this.viewController = controller;
-        modelController = new ModelControllerImpl(mContext, this,list);
+        modelController = new ModelControllerImpl(mContext, this, list);
         WifiReceiver.bindWifiState(modelController);
         wifiReceiver = new WifiReceiver();
         IntentFilter intentFilter = new IntentFilter();
@@ -49,16 +49,16 @@ public class PresenterImpl implements IPresenter {
     @Override
     public void init(final List<ScanResult> list) {
 //        Log.d("lishihui_open","open:"+WifiAdmin.getInstance(mContext).isWifiEnable());
-        if (WifiAdmin.getInstance(mContext).isWifiEnable()||viewController.getWifiIsChecked()) {
+        if (WifiAdmin.getInstance(mContext).isWifiEnable() || viewController.getWifiIsChecked()) {
             viewController.openToggle();
             openWifiAndScan(list);
-            if (viewController.getOnConnectCallBack()!=null){
+            if (viewController.getOnConnectCallBack() != null) {
                 viewController.getOnConnectCallBack().isWifiEnable(true);
             }
         } else {
             viewController.closeToggle();
             viewController.showCloseTip();
-            if (viewController.getOnConnectCallBack()!=null){
+            if (viewController.getOnConnectCallBack() != null) {
                 viewController.getOnConnectCallBack().isWifiEnable(false);
             }
         }
@@ -89,12 +89,13 @@ public class PresenterImpl implements IPresenter {
     @Override
     public void connect(final ScanResult scanResult) {
         Log.d("isSuccess1", "scanResult");
+        Log.d("isSuccess1", "scanResult.BSSID:" + scanResult.BSSID + "->getBSSID():" + WifiAdmin.getInstance(mContext).getBSSID());
         //判断点击是否是当前已经连接的
         if (scanResult.BSSID.equals(WifiAdmin.getInstance(mContext).getBSSID()) && NetUtils.isWifi(mContext)) {
             viewController.showDisconnectDialog(scanResult, new DialogUtils.DialogCallBack() {
                 @Override
                 public void callBack(View view, ScanResult scanResult, String str) {
-                    viewController.closeDisconnectDialog();
+                    Log.d("isSuccess1", "callBack");
                     Log.d("disconnect", "scanResult.SSID:" + scanResult.SSID);
                     WifiConfig.getInstance(mContext).removePasswd(scanResult.SSID);
                     if (WifiAdmin.getInstance(mContext).getNetworkId() != -1) {
@@ -102,6 +103,7 @@ public class PresenterImpl implements IPresenter {
                         WifiAdmin.getInstance(mContext).disconnectWifi(id);
                         WifiAdmin.getInstance(mContext).removeWifi("\"" + scanResult.SSID + "\"", id);
                     }
+                    viewController.closeDisconnectDialog();
 
                 }
 
@@ -119,13 +121,13 @@ public class PresenterImpl implements IPresenter {
             final String security = scanResult.capabilities.toLowerCase();
             if (!security.contains("wpa") && !security.contains("wep")) {
                 connectWifi(scanResult.SSID, "", "");
-                viewController.showLoadDialog();
+//                viewController.showLoadDialog();
             } else {
                 viewController.showInputPasswordDialog(scanResult, new DialogUtils.DialogCallBack() {
                     @Override
                     public void callBack(View view, ScanResult scanResult, String passward) {
                         viewController.closeInputPasswordDialog();
-                        viewController.showLoadDialog();
+//                        viewController.showLoadDialog();
                         current_ssid = scanResult.SSID;
                         current_password = passward;
                         Log.d("isSuccess1", "scanResult.SSID:" + scanResult.SSID);
@@ -167,13 +169,13 @@ public class PresenterImpl implements IPresenter {
         } else {
             if (TextUtils.isEmpty(secrity)) {
                 Log.d("connectWifi", "nopsd");
-                WifiAdmin.getInstance(mContext).addNetwork(WifiAdmin.getInstance(mContext).createWifiInfo(ssid, "", 1),true);
+                WifiAdmin.getInstance(mContext).addNetwork(WifiAdmin.getInstance(mContext).createWifiInfo(ssid, "", 1), true);
             } else if (secrity.equals("wpa")) {
                 Log.d("connectWifi", "wpa");
-                WifiAdmin.getInstance(mContext).addNetwork(WifiAdmin.getInstance(mContext).createWifiInfo(ssid, password, 3),true);
+                WifiAdmin.getInstance(mContext).addNetwork(WifiAdmin.getInstance(mContext).createWifiInfo(ssid, password, 3), true);
             } else if (secrity.equals("wep")) {
                 Log.d("connectWifi", "wep");
-                WifiAdmin.getInstance(mContext).addNetwork(WifiAdmin.getInstance(mContext).createWifiInfo(ssid, password, 2),true);
+                WifiAdmin.getInstance(mContext).addNetwork(WifiAdmin.getInstance(mContext).createWifiInfo(ssid, password, 2), true);
             }
         }
     }
@@ -198,10 +200,10 @@ public class PresenterImpl implements IPresenter {
                 if (netId != -1) {
                     Log.d("connectWifi", "justId");
                     WifiAdmin.getInstance(mContext).ConnectWifi(netId);
-                }else {
-                    WifiAdmin.getInstance(mContext).addNetwork(WifiAdmin.getInstance(mContext).createWifiInfo(ssid, password, type),true);
+                } else {
+                    WifiAdmin.getInstance(mContext).addNetwork(WifiAdmin.getInstance(mContext).createWifiInfo(ssid, password, type), true);
                 }
-                viewController.showLoadDialog();
+//                viewController.showLoadDialog();
             }
 
             @Override

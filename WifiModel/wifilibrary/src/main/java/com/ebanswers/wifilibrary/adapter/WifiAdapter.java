@@ -3,7 +3,6 @@ package com.ebanswers.wifilibrary.adapter;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -68,8 +67,6 @@ public class WifiAdapter extends BaseAdapter {
         }
         ScanResult result = getItem(position);
         if (result.BSSID.equals(WifiAdmin.getInstance(parent.getContext()).getBSSID()) && NetUtils.isWifi(parent.getContext())) {
-            Log.d("lishihui_netId","result.SSID："+result.SSID);
-            Log.d("lishihui_netId","WifiAdmin.getInstance(parent.getContext()).getNetworkId()："+WifiAdmin.getInstance(parent.getContext()).getNetworkId());
 //            WifiConfig.getInstance(parent.getContext()).setSsid(result.SSID);
 //            WifiConfig.getInstance(parent.getContext()).setSaveWifiId(result.SSID, WifiAdmin.getInstance(parent.getContext()).getNetworkId());
             mPresenter.savePassword(result.SSID);

@@ -120,6 +120,7 @@ public class WifiAdmin {
         int id = IsConfiguration(paramWifiConfiguration.SSID);
         if (id == -1) {
             id = mWifiManager.addNetwork(paramWifiConfiguration);
+            mWifiManager.saveConfiguration();
             Log.d("connectWifi", "updateNetwork:" + id);
         }
         if (id != -1 && isConnect) {

@@ -5,9 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.NetworkInfo;
 import android.net.wifi.SupplicantState;
-import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,23 +22,13 @@ public class WifiReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION)) {
             SupplicantState supplicantState = (SupplicantState) intent.getParcelableExtra(WifiManager.EXTRA_NEW_STATE);
-            Log.d("lishihui_DetailedState", "SupplicantState2:" + supplicantState);
-            NetworkInfo.DetailedState state = WifiInfo.getDetailedStateOf(supplicantState);
-            Log.d("lishihui_DetailedState", "DetailedState:" + state);
             int error = intent.getIntExtra(WifiManager.EXTRA_SUPPLICANT_ERROR, -1);
             if (error == WifiManager.ERROR_AUTHENTICATING) {
                 wifiStatus(WIFI_FAIL, "身份认证失败");
             }
-            switch (supplicantState) {
-                case DISCONNECTED:
-                    wifiStatus(WIFI_DISCONNECT);
-                    break;
-            }
-
         } else if (intent.getAction().equals(WifiManager.RSSI_CHANGED_ACTION)) {
             wifiStatus(WIFI_UPDATE);
         } else if (intent.getAction().equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)) {// wifi连接上与否
-            wifiStatus(WIFI_UPDATE);
             NetworkInfo info = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
             if (info.getState().equals(NetworkInfo.State.CONNECTED)) {
                 System.out.println("wifi网络连接成功");
@@ -157,6 +145,72 @@ public class WifiReceiver extends BroadcastReceiver {
         }
     }
 
+    public static boolean isHandshakeState(SupplicantState state) {
+        switch(state) {
+            case AUTHENTICATING:
+            case ASSOCIATING:
+            case ASSOCIATED:
+            case FOUR_WAY_HANDSHAKE:
+            case GROUP_HANDSHAKE:
+                return true;
+            case COMPLETED:
+            case DISCONNECTED:
+            case INTERFACE_DISABLED:
+            case INACTIVE:
+            case SCANNING:
+            case DORMANT:
+            case UNINITIALIZED:
+            case INVALID:
+                return false;
+            default:
+                throw new IllegalArgumentException("Unknown supplicant state");
+        }
+    }
+
+    public static boolean isConnecting(SupplicantState state) {
+        switch(state) {
+            case AUTHENTICATING:
+            case ASSOCIATING:
+            case ASSOCIATED:
+            case FOUR_WAY_HANDSHAKE:
+            case GROUP_HANDSHAKE:
+            case COMPLETED:
+                return true;
+            case DISCONNECTED:
+            case INTERFACE_DISABLED:
+            case INACTIVE:
+            case SCANNING:
+            case DORMANT:
+            case UNINITIALIZED:
+            case INVALID:
+                return false;
+            default:
+                throw new IllegalArgumentException("Unknown supplicant state");
+        }
+    }
+
+    public static boolean isDriverActive(SupplicantState state) {
+        switch(state) {
+            case DISCONNECTED:
+            case DORMANT:
+            case INACTIVE:
+            case AUTHENTICATING:
+            case ASSOCIATING:
+            case ASSOCIATED:
+            case SCANNING:
+            case FOUR_WAY_HANDSHAKE:
+            case GROUP_HANDSHAKE:
+            case COMPLETED:
+                return true;
+            case INTERFACE_DISABLED:
+            case UNINITIALIZED:
+            case INVALID:
+                return false;
+            default:
+                throw new IllegalArgumentException("Unknown supplicant state");
+        }
+    }
+
 
     public interface WifiStateChange {
         //打开了wifi
@@ -180,4 +234,6 @@ public class WifiReceiver extends BroadcastReceiver {
         //异常出错
         void failWifi(String failMsg);
     }
+
+
 }

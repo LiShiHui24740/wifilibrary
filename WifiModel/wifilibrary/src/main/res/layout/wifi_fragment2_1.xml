@@ -45,7 +45,7 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:layout_marginTop="10dp"
-            android:divider="#1a1a1a"
+            android:divider="#353439"
             android:dividerHeight="1px"
             android:numColumns="5"
             android:overScrollMode="never"

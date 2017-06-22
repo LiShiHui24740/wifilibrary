@@ -1,5 +1,6 @@
 package com.ebanswers.wifimodel;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -27,7 +28,16 @@ public class MainActivity extends AppCompatActivity {
          *  TYPE2_NONE = 0x06;//grideView,添加wifi和手动搜索为不可见
          */
         StyleConfig styleConfig = new StyleConfig.Builder()
-                .setLayoutType(StyleConfig.TYPE1_NONE).build();
+                .setLayoutType(StyleConfig.TYPE1_2)
+                .setBackGroundColor(Color.parseColor("#161B21"))
+                .setItemTextColor(Color.parseColor("#767C78"))
+                .build();
+        WifiFragment.setOnBackClickListener(new StyleConfig.OnBackClickListener() {
+            @Override
+            public void onClick() {
+                finish();
+            }
+        });
         fragmentManager.beginTransaction().replace(R.id.id_fl_container, WifiFragment.getInstance(styleConfig)).commitAllowingStateLoss();
     }
 }

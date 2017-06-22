@@ -6,7 +6,6 @@ import android.net.wifi.ScanResult;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +14,7 @@ import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -41,6 +41,7 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
 
     private Context mContext;
     private View mContentView;
+    private ImageView back;
     private ListView mListView;
     private GridView mGridview;
     private CheckBox mWifiToggle;
@@ -52,8 +53,10 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
     private PresenterImpl mPresenterImpl;
     private Dialog loadDialog, passwordDialog, disconnectDialog, addWifiDialog;
     private int layout_type = 2, top_bg_color = 0, top_bg_drawable = 0, top_title_size = 0, top_title_color = 0, item_text_size = 0, item_text_color = 0, bg_color = 0, bg_drawable = 0;
+    private boolean backIsVisible = true;
+    private int backDrawableId = 0;
     private OnConnectCallBack onConnectCallBack;
-
+    private static StyleConfig.OnBackClickListener onBackClickListener;
 
     public static WifiFragment getInstance(StyleConfig styleConfig) {
         WifiFragment wifiFragment = new WifiFragment();
@@ -78,16 +81,16 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
         Bundle bundle = getArguments();
         if (bundle != null) {
             layout_type = bundle.getInt("layout_type");
-            Log.d("lishihui_aaa", "layout_type：" + layout_type);
             top_bg_color = bundle.getInt("top_bg_color");
+            backIsVisible = bundle.getBoolean("backIsVisisble");
             top_bg_drawable = bundle.getInt("top_bg_drawable");
-            Log.d("lishihui_aaa", "top_bg_drawable：" + top_bg_drawable);
             top_title_size = bundle.getInt("top_title_size");
             top_title_color = bundle.getInt("top_title_color");
             item_text_size = bundle.getInt("item_text_size");
             item_text_color = bundle.getInt("item_text_color");
-            bg_color = bundle.getInt("bg_color");
-            bg_color = bundle.getInt("background_drawable");
+            bg_color = bundle.getInt("background_color");
+            backDrawableId = bundle.getInt("backDrawableId");
+            bg_drawable = bundle.getInt("background_drawable");
         }
     }
 
@@ -171,9 +174,15 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
         mPresenterImpl.init(mListScanResult);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        mPresenterImpl.updateData();
+    }
+
     private void initViews() {
         TextView mTitle = (TextView) mContentView.findViewById(R.id.id_tv_wifi_header);
-        RelativeLayout rl_title_top_bg = (RelativeLayout) mContentView.findViewById(R.id.id_rl_title_top_bg);
+        LinearLayout rl_title_top_bg = (LinearLayout) mContentView.findViewById(R.id.id_rl_title_top_bg);
         LinearLayout ll_wifi_footer;
         if (layout_type == TYPE1_NONE) {
             ll_wifi_footer = (LinearLayout) mContentView.findViewById(R.id.id_ll_wifi_footer1);
@@ -183,7 +192,24 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
             ll_wifi_footer.setVisibility(View.GONE);
         }
         mWifiToggle = (CheckBox) mContentView.findViewById(R.id.id_cb_toggle);
+        back = (ImageView) mContentView.findViewById(R.id.id_tv_wifi_back);
+        if (backDrawableId>0){
+            back.setImageResource(backDrawableId);
+        }
+        if (backIsVisible){
+            back.setVisibility(View.VISIBLE);
+        }else{
+            back.setVisibility(View.GONE);
+        }
         mWifiToggle.setOnCheckedChangeListener(this);
+        back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (onBackClickListener!=null){
+                    onBackClickListener.onClick();
+                }
+            }
+        });
         if (top_title_size != 0) {
             mTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, top_title_size);
         }
@@ -259,8 +285,8 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
         if (passwordDialog != null) {
             if (passwordDialog.isShowing())
                 passwordDialog.dismiss();
-            passwordDialog = null;
         }
+        passwordDialog = null;
 
     }
 
@@ -276,8 +302,8 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
         if (disconnectDialog != null) {
             if (disconnectDialog.isShowing())
                 disconnectDialog.dismiss();
-            disconnectDialog = null;
         }
+        disconnectDialog = null;
 
     }
 
@@ -285,28 +311,26 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
     public void showLoadDialog() {
         closeDisconnectDialog();
         closeInputPasswordDialog();
-        closeLoadDialog();
-        if (loadDialog == null) {
+        if (loadDialog == null||!loadDialog.isShowing()) {
             loadDialog = DialogUtils.createLoadDialog(mContext);
-            Log.d("loadDialog", "loadDialog:");
         }
     }
 
+
+
     @Override
     public void closeLoadDialog() {
-        Log.d("loadDialog", "关闭load");
         if (loadDialog != null) {
             if (loadDialog.isShowing())
                 loadDialog.dismiss();
-            loadDialog = null;
         }
-
+        loadDialog = null;
     }
 
     @Override
     public void showAddWifiDialog(DialogUtils.DialogAddWifiCallBack dialogAddWifiCallBack) {
         closeAddWifiDialog();
-        if (addWifiDialog == null) {
+        if (addWifiDialog == null||!addWifiDialog.isShowing()) {
             addWifiDialog = DialogUtils.createAddWifiDialog(mContext, dialogAddWifiCallBack);
         }
     }
@@ -388,6 +412,10 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
                 onConnectCallBack.isWifiEnable(false);
             }
         }
+    }
+
+    public static void setOnBackClickListener(StyleConfig.OnBackClickListener listener) {
+        onBackClickListener = listener;
     }
 
     @Override
