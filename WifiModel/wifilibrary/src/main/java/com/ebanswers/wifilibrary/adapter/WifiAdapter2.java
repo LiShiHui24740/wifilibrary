@@ -16,7 +16,6 @@ import com.ebanswers.wifilibrary.NetUtils;
 import com.ebanswers.wifilibrary.R;
 import com.ebanswers.wifilibrary.WifiAdmin;
 import com.ebanswers.wifilibrary.p.IPresenter;
-import com.ebanswers.wifilibrary.v.IViewController;
 
 import java.util.List;
 
@@ -27,12 +26,11 @@ import java.util.List;
 public class WifiAdapter2 extends BaseAdapter {
     private List<ScanResult> mList;
     private IPresenter mPresenter;
-    private IViewController mViewController;
-    private int textSize,textColor;
-    public WifiAdapter2(List<ScanResult> mList,int itemTextSize,int item_text_color, IViewController viewController,IPresenter presenter) {
+    private int textSize, textColor;
+
+    public WifiAdapter2(List<ScanResult> mList, int itemTextSize, int item_text_color, IPresenter presenter) {
         this.mList = mList;
         mPresenter = presenter;
-        mViewController = viewController;
         textSize = itemTextSize;
         textColor = item_text_color;
     }
@@ -71,19 +69,20 @@ public class WifiAdapter2 extends BaseAdapter {
             Log.d("netId", "WifiAdmin.getInstance(parent.getContext()).getNetworkId()：" + WifiAdmin.getInstance(parent.getContext()).getNetworkId());
 //            WifiConfig.getInstance(parent.getContext()).setSsid(result.SSID);
 //            WifiConfig.getInstance(parent.getContext()).setSaveWifiId(result.SSID, WifiAdmin.getInstance(parent.getContext()).getNetworkId());
-            mPresenter.savePassword(result.SSID);
+            if (mPresenter != null)
+                mPresenter.savePassword(result.SSID);
             viewHolder.connected.setVisibility(View.VISIBLE);
         } else {
             viewHolder.connected.setVisibility(View.GONE);
         }
-        if (textSize!=0){
-            viewHolder.name.setTextSize(TypedValue.COMPLEX_UNIT_SP,textSize);
+        if (textSize != 0) {
+            viewHolder.name.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize);
         }
-        if (textColor!=0){
+        if (textColor != 0) {
             viewHolder.name.setTextColor(textColor);
         }
         viewHolder.name.setText(result.SSID);
-        String security = "" ;
+        String security = "";
         if (!TextUtils.isEmpty(result.capabilities))
             security = result.capabilities.toLowerCase();
         int signalLevel = WifiManager.calculateSignalLevel(result.level, 4);

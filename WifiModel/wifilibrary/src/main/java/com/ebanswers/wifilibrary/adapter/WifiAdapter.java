@@ -15,7 +15,6 @@ import com.ebanswers.wifilibrary.NetUtils;
 import com.ebanswers.wifilibrary.R;
 import com.ebanswers.wifilibrary.WifiAdmin;
 import com.ebanswers.wifilibrary.p.IPresenter;
-import com.ebanswers.wifilibrary.v.IViewController;
 
 import java.util.List;
 
@@ -26,12 +25,10 @@ import java.util.List;
 public class WifiAdapter extends BaseAdapter {
     private List<ScanResult> mList;
     private IPresenter mPresenter;
-    private IViewController mViewController;
     private int textSize,textColor;
-    public WifiAdapter(List<ScanResult> mList,int itemTextSize,int item_text_color, IViewController viewController,IPresenter presenter) {
+    public WifiAdapter(List<ScanResult> mList,int itemTextSize,int item_text_color,IPresenter presenter) {
         this.mList = mList;
         mPresenter = presenter;
-        mViewController = viewController;
         textSize = itemTextSize;
         textColor = item_text_color;
     }
@@ -69,6 +66,7 @@ public class WifiAdapter extends BaseAdapter {
         if (result.BSSID.equals(WifiAdmin.getInstance(parent.getContext()).getBSSID()) && NetUtils.isWifi(parent.getContext())) {
 //            WifiConfig.getInstance(parent.getContext()).setSsid(result.SSID);
 //            WifiConfig.getInstance(parent.getContext()).setSaveWifiId(result.SSID, WifiAdmin.getInstance(parent.getContext()).getNetworkId());
+            if (mPresenter!=null)
             mPresenter.savePassword(result.SSID);
             viewHolder.connected.setVisibility(View.VISIBLE);
         } else {

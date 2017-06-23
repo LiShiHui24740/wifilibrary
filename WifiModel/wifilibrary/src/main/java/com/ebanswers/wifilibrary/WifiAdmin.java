@@ -11,6 +11,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by lishihui on 2017/4/13.
@@ -18,9 +19,9 @@ import java.util.List;
 
 public class WifiAdmin {
     private static WifiAdmin wifiAdmin = null;
-    private List<WifiConfiguration> mWifiConfiguration; //无线网络配置信息类集合(网络连接列表)
-    private List<ScanResult> mWifiList; //检测到接入点信息类 集合
-    private List<ScanResult> filterWifiLists;
+    private CopyOnWriteArrayList<WifiConfiguration> mWifiConfiguration; //无线网络配置信息类集合(网络连接列表)
+    private CopyOnWriteArrayList<ScanResult> mWifiList; //检测到接入点信息类 集合
+    private CopyOnWriteArrayList<ScanResult> filterWifiLists;
     //描述任何Wifi连接状态
     private WifiInfo mWifiInfo;
 
@@ -35,8 +36,8 @@ public class WifiAdmin {
      */
     public static WifiAdmin getInstance(Context context) {
         if (wifiAdmin == null) {
-            synchronized (WifiAdmin.class){
-                if (wifiAdmin==null){
+            synchronized (WifiAdmin.class) {
+                if (wifiAdmin == null) {
                     wifiAdmin = new WifiAdmin(context);
                 }
             }
@@ -49,15 +50,16 @@ public class WifiAdmin {
         this.mWifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         //获取连接信息
         this.mWifiInfo = this.mWifiManager.getConnectionInfo();
-        mWifiList = new ArrayList<>();
-        filterWifiLists = new ArrayList<>();
+        mWifiList = new CopyOnWriteArrayList<>();
+        filterWifiLists = new CopyOnWriteArrayList<>();
+        mWifiConfiguration = new CopyOnWriteArrayList<>();
     }
 
 
     //判定指定WIFI是否已经配置好,依据WIFI的地址BSSID,返回NetId
     public int IsConfiguration(String SSID) {
         List<WifiConfiguration> wifiConfigList = mWifiManager.getConfiguredNetworks();
-        if (wifiConfigList!=null){
+        if (wifiConfigList != null) {
             for (int i = 0; i < wifiConfigList.size(); i++) {
                 if (wifiConfigList.get(i).SSID.equals(SSID)) {//地址相同
                     return wifiConfigList.get(i).networkId;
@@ -179,7 +181,7 @@ public class WifiAdmin {
      * 根据wifi信息创建或关闭一个热点
      *
      * @param paramWifiConfiguration
-     * @param paramBoolean 关闭标志
+     * @param paramBoolean           关闭标志
      */
     public void createWifiAP(WifiConfiguration paramWifiConfiguration, boolean paramBoolean) {
         try {
@@ -202,9 +204,9 @@ public class WifiAdmin {
     /**
      * 创建一个wifi信息
      *
-     * @param SSID 名称
+     * @param SSID     名称
      * @param password 密码
-     * @param type 是"ap"还是"wifi"
+     * @param type     是"ap"还是"wifi"
      * @return
      */
     public WifiConfiguration createWifiInfo(String SSID, String password, int type) {
@@ -360,7 +362,8 @@ public class WifiAdmin {
      * 得到网络列表
      **/
     public List<ScanResult> getWifiList() {
-        return this.mWifiList = mWifiManager.getScanResults();
+        setWifiList();
+        return mWifiList;
     }
 
     /**
@@ -382,7 +385,7 @@ public class WifiAdmin {
      * 设置wifi搜索结果
      **/
     public void setWifiList() {
-        this.mWifiList = this.mWifiManager.getScanResults();
+       updateWifiList();
     }
 
     /**
@@ -392,22 +395,35 @@ public class WifiAdmin {
         this.mWifiManager.startScan();
         boolean scan = mWifiManager.startScan();
         if (scan) {
-            mWifiList = mWifiManager.getScanResults();
-            mWifiConfiguration = mWifiManager.getConfiguredNetworks();
-            Log.d("wifi_result", "mWifiList.size():" + mWifiList.size());
+            updateWifiList();
+            updateConfigure();
+        }
+    }
+
+    private void updateWifiList() {
+        if (mWifiList != null) {
+            mWifiList.clear();
+            List<ScanResult> list = mWifiManager.getScanResults();
+            if (list!=null)
+                mWifiList.addAll(list);
         }
     }
 
     public void updateConfigure() {
-        mWifiConfiguration = mWifiManager.getConfiguredNetworks();
+        if (mWifiConfiguration != null) {
+            mWifiConfiguration.clear();
+            List<WifiConfiguration> list = mWifiManager.getConfiguredNetworks();
+            if (list!=null)
+            mWifiConfiguration.addAll(list);
+        }
     }
 
     public List<ScanResult> getWifiListWithFilting() {
-        mWifiList = mWifiManager.getScanResults();
-        filterWifiLists.clear();
+        updateWifiList();
         boolean tf;
         ScanResult currentResult = null;
-        if (mWifiList!=null){
+        if (mWifiList != null&&filterWifiLists!=null) {
+            filterWifiLists.clear();
             for (ScanResult result : mWifiList) {
                 tf = false;
                 ArrayList<ScanResult> removeList = new ArrayList<>();

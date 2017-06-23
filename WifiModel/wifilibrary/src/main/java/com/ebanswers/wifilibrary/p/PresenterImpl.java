@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.IntentFilter;
 import android.net.wifi.ScanResult;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 
 import com.ebanswers.wifilibrary.NetUtils;
@@ -16,7 +15,7 @@ import com.ebanswers.wifilibrary.m.ModelControllerImpl;
 import com.ebanswers.wifilibrary.v.IViewController;
 
 import java.util.List;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
@@ -28,7 +27,7 @@ public class PresenterImpl implements IPresenter {
     private Context mContext;
     private WifiReceiver wifiReceiver;
     private ModelControllerImpl modelController;
-    private Executor threadPool = Executors.newCachedThreadPool();
+    private ExecutorService threadPool = Executors.newCachedThreadPool();
     private String current_ssid, current_password;
 
     public PresenterImpl(Context context, IViewController controller, List<ScanResult> list) {
@@ -48,24 +47,27 @@ public class PresenterImpl implements IPresenter {
 
     @Override
     public void init(final List<ScanResult> list) {
-//        Log.d("lishihui_open","open:"+WifiAdmin.getInstance(mContext).isWifiEnable());
-        if (WifiAdmin.getInstance(mContext).isWifiEnable() || viewController.getWifiIsChecked()) {
-            viewController.openToggle();
-            openWifiAndScan(list);
-            if (viewController.getOnConnectCallBack() != null) {
-                viewController.getOnConnectCallBack().isWifiEnable(true);
-            }
-        } else {
-            viewController.closeToggle();
-            viewController.showCloseTip();
-            if (viewController.getOnConnectCallBack() != null) {
-                viewController.getOnConnectCallBack().isWifiEnable(false);
+        if (viewController != null) {
+            if (WifiAdmin.getInstance(mContext).isWifiEnable() || viewController.getWifiIsChecked()) {
+                viewController.openToggle();
+                openWifiAndScan(list);
+                if (viewController.getOnConnectCallBack() != null) {
+                    viewController.getOnConnectCallBack().isWifiEnable(true);
+                }
+            } else {
+                viewController.closeToggle();
+                viewController.showCloseTip();
+                if (viewController.getOnConnectCallBack() != null) {
+                    viewController.getOnConnectCallBack().isWifiEnable(false);
+                }
             }
         }
+
     }
 
     @Override
     public void openWifiAndScan(final List<ScanResult> list) {
+        if (viewController != null)
         viewController.showOpenTip();
         scan();
     }
@@ -82,78 +84,73 @@ public class PresenterImpl implements IPresenter {
 
     @Override
     public void closeSystemWifi() {
+        if (viewController != null)
         viewController.showCloseTip();
         WifiAdmin.getInstance(mContext).closeWifi();
     }
 
     @Override
     public void connect(final ScanResult scanResult) {
-        Log.d("isSuccess1", "scanResult");
-        Log.d("isSuccess1", "scanResult.BSSID:" + scanResult.BSSID + "->getBSSID():" + WifiAdmin.getInstance(mContext).getBSSID());
         //判断点击是否是当前已经连接的
         if (scanResult.BSSID.equals(WifiAdmin.getInstance(mContext).getBSSID()) && NetUtils.isWifi(mContext)) {
-            viewController.showDisconnectDialog(scanResult, new DialogUtils.DialogCallBack() {
-                @Override
-                public void callBack(View view, ScanResult scanResult, String str) {
-                    Log.d("isSuccess1", "callBack");
-                    Log.d("disconnect", "scanResult.SSID:" + scanResult.SSID);
-                    WifiConfig.getInstance(mContext).removePasswd(scanResult.SSID);
-                    if (WifiAdmin.getInstance(mContext).getNetworkId() != -1) {
-                        int id = WifiAdmin.getInstance(mContext).getNetworkId();
-                        WifiAdmin.getInstance(mContext).disconnectWifi(id);
-                        WifiAdmin.getInstance(mContext).removeWifi("\"" + scanResult.SSID + "\"", id);
-                    }
-                    viewController.closeDisconnectDialog();
-
-                }
-
-                @Override
-                public void ignore() {
-
-                }
-
-                @Override
-                public void cancel() {
-                    viewController.closeDisconnectDialog();
-                }
-            });
-        } else {
-            final String security = scanResult.capabilities.toLowerCase();
-            if (!security.contains("wpa") && !security.contains("wep")) {
-                connectWifi(scanResult.SSID, "", "");
-//                viewController.showLoadDialog();
-            } else {
-                viewController.showInputPasswordDialog(scanResult, new DialogUtils.DialogCallBack() {
+            if (viewController != null) {
+                viewController.showDisconnectDialog(scanResult, new DialogUtils.DialogCallBack() {
                     @Override
-                    public void callBack(View view, ScanResult scanResult, String passward) {
-                        viewController.closeInputPasswordDialog();
-//                        viewController.showLoadDialog();
-                        current_ssid = scanResult.SSID;
-                        current_password = passward;
-                        Log.d("isSuccess1", "scanResult.SSID:" + scanResult.SSID);
-                        Log.d("isSuccess1", "passward:" + passward);
-                        if (security.contains("wpa")) {
-                            Log.d("lishihui_netId", "wpa:" + scanResult.SSID + ",psd:" + passward);
-                            connectWifi(scanResult.SSID, passward, "wpa");
-                        } else if (security.contains("wep")) {
-                            connectWifi(scanResult.SSID, passward, "wep");
+                    public void callBack(View view, ScanResult scanResult, String str) {
+                        WifiConfig.getInstance(mContext).removePasswd(scanResult.SSID);
+                        if (WifiAdmin.getInstance(mContext).getNetworkId() != -1) {
+                            int id = WifiAdmin.getInstance(mContext).getNetworkId();
+                            WifiAdmin.getInstance(mContext).disconnectWifi(id);
+                            WifiAdmin.getInstance(mContext).removeWifi("\"" + scanResult.SSID + "\"", id);
                         }
+                        viewController.closeDisconnectDialog();
+
                     }
 
                     @Override
                     public void ignore() {
-                        Log.d("isSuccess1", "ignore()");
-                        Log.d("isSuccess1", "scanResult.BSSID:" + scanResult.BSSID);
-                        viewController.closeInputPasswordDialog();
-                        WifiConfig.getInstance(mContext).removePasswd(scanResult.SSID);
-                        WifiAdmin.getInstance(mContext).removeWifi("\"" + scanResult.SSID + "\"");
+
                     }
 
                     @Override
                     public void cancel() {
-                        viewController.closeInputPasswordDialog();
+                        viewController.closeDisconnectDialog();
                     }
                 });
+            }
+
+        } else {
+            final String security = scanResult.capabilities.toLowerCase();
+            if (!security.contains("wpa") && !security.contains("wep")) {
+                connectWifi(scanResult.SSID, "", "");
+            } else {
+                if (viewController != null) {
+                    viewController.showInputPasswordDialog(scanResult, new DialogUtils.DialogCallBack() {
+                        @Override
+                        public void callBack(View view, ScanResult scanResult, String passward) {
+                            viewController.closeInputPasswordDialog();
+                            current_ssid = scanResult.SSID;
+                            current_password = passward;
+                            if (security.contains("wpa")) {
+                                connectWifi(scanResult.SSID, passward, "wpa");
+                            } else if (security.contains("wep")) {
+                                connectWifi(scanResult.SSID, passward, "wep");
+                            }
+                        }
+
+                        @Override
+                        public void ignore() {
+                            viewController.closeInputPasswordDialog();
+                            WifiConfig.getInstance(mContext).removePasswd(scanResult.SSID);
+                            WifiAdmin.getInstance(mContext).removeWifi("\"" + scanResult.SSID + "\"");
+                        }
+
+                        @Override
+                        public void cancel() {
+                            viewController.closeInputPasswordDialog();
+                        }
+                    });
+                }
 
             }
 
@@ -164,17 +161,13 @@ public class PresenterImpl implements IPresenter {
     private void connectWifi(String ssid, String password, String secrity) {
         int netId = WifiAdmin.getInstance(mContext).IsConfiguration("\"" + ssid + "\"");
         if (netId != -1) {
-            Log.d("connectWifi", "justId");
             WifiAdmin.getInstance(mContext).ConnectWifi(netId);
         } else {
             if (TextUtils.isEmpty(secrity)) {
-                Log.d("connectWifi", "nopsd");
                 WifiAdmin.getInstance(mContext).addNetwork(WifiAdmin.getInstance(mContext).createWifiInfo(ssid, "", 1), true);
             } else if (secrity.equals("wpa")) {
-                Log.d("connectWifi", "wpa");
                 WifiAdmin.getInstance(mContext).addNetwork(WifiAdmin.getInstance(mContext).createWifiInfo(ssid, password, 3), true);
             } else if (secrity.equals("wep")) {
-                Log.d("connectWifi", "wep");
                 WifiAdmin.getInstance(mContext).addNetwork(WifiAdmin.getInstance(mContext).createWifiInfo(ssid, password, 2), true);
             }
         }
@@ -183,35 +176,35 @@ public class PresenterImpl implements IPresenter {
 
     public void updateData() {
         WifiAdmin.getInstance(mContext).updateConfigure();
-        viewController.refreshList();
+        if (viewController != null)
+            viewController.refreshList();
     }
 
     @Override
     public void addWifi() {
-        viewController.showAddWifiDialog(new DialogUtils.DialogAddWifiCallBack() {
-            @Override
-            public void callBack(String ssid, String password, int type) {
-                viewController.closeAddWifiDialog();
-                current_ssid = ssid;
-                current_password = password;
-                Log.d("isSuccess1", "scanResult.SSID:" + ssid);
-                Log.d("isSuccess1", "passward:" + password);
-                int netId = WifiAdmin.getInstance(mContext).IsConfiguration("\"" + ssid + "\"");
-                if (netId != -1) {
-                    Log.d("connectWifi", "justId");
-                    WifiAdmin.getInstance(mContext).ConnectWifi(netId);
-                } else {
-                    WifiAdmin.getInstance(mContext).addNetwork(WifiAdmin.getInstance(mContext).createWifiInfo(ssid, password, type), true);
+        if (viewController != null) {
+            viewController.showAddWifiDialog(new DialogUtils.DialogAddWifiCallBack() {
+                @Override
+                public void callBack(String ssid, String password, int type) {
+                    viewController.closeAddWifiDialog();
+                    current_ssid = ssid;
+                    current_password = password;
+                    int netId = WifiAdmin.getInstance(mContext).IsConfiguration("\"" + ssid + "\"");
+                    if (netId != -1) {
+                        WifiAdmin.getInstance(mContext).ConnectWifi(netId);
+                    } else {
+                        WifiAdmin.getInstance(mContext).addNetwork(WifiAdmin.getInstance(mContext).createWifiInfo(ssid, password, type), true);
+                    }
                 }
-//                viewController.showLoadDialog();
-            }
 
-            @Override
-            public void cancel() {
-                viewController.closeAddWifiDialog();
-            }
+                @Override
+                public void cancel() {
+                    viewController.closeAddWifiDialog();
+                }
 
-        });
+            });
+        }
+
     }
 
     @Override
@@ -234,7 +227,15 @@ public class PresenterImpl implements IPresenter {
     @Override
     public void destory() {
         mContext.unregisterReceiver(wifiReceiver);
+        if (threadPool != null && !threadPool.isShutdown()) {
+            threadPool.shutdownNow();
+        }
+        if (modelController != null) {
+            modelController.destory();
+        }
         WifiConfig.destory();
+        this.viewController = null;
+        this.modelController = null;
     }
 
     @Override

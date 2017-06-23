@@ -11,7 +11,7 @@ import com.ebanswers.wifilibrary.WifiReceiver;
 import com.ebanswers.wifilibrary.p.IPresenter;
 
 import java.util.List;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
@@ -22,7 +22,7 @@ public class ModelControllerImpl implements WifiReceiver.WifiStateChange {
     private List<ScanResult> mlist;
     private IPresenter mPresenter;
     private Context mContext;
-    private Executor executor = Executors.newSingleThreadExecutor();
+    private ExecutorService executor = Executors.newSingleThreadExecutor();
     private Handler mHandler = new Handler();
 
     public ModelControllerImpl(Context context, IPresenter presenter, List<ScanResult> mlist) {
@@ -47,10 +47,13 @@ public class ModelControllerImpl implements WifiReceiver.WifiStateChange {
     @Override
     public void connectingWifi() {
         Log.d("loadDialog", "openingWifi");
-        mPresenter.getViewController().showLoadDialog();
-        if (mPresenter.getViewController().getOnConnectCallBack() != null) {
-            mPresenter.getViewController().getOnConnectCallBack().connectResult(mlist.get(0));
+        if (mPresenter!=null&&mPresenter.getViewController()!=null){
+            mPresenter.getViewController().showLoadDialog();
+            if (mPresenter.getViewController().getOnConnectCallBack() != null) {
+                mPresenter.getViewController().getOnConnectCallBack().connectResult(mlist.get(0));
+            }
         }
+
     }
 
     /**
@@ -59,6 +62,7 @@ public class ModelControllerImpl implements WifiReceiver.WifiStateChange {
     @Override
     public void connectWifi() {
         Log.d("loadDialog", "connectWifi:closeLoadDialog");
+        if (mPresenter!=null&&mPresenter.getViewController()!=null)
         mPresenter.getViewController().closeLoadDialog();
     }
 
@@ -69,33 +73,47 @@ public class ModelControllerImpl implements WifiReceiver.WifiStateChange {
 
     @Override
     public void updateWifiList() {
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                final List<ScanResult> scanResults = WifiAdmin.getInstance(mContext).getWifiListWithFilting();
-                if (scanResults != null) {
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (mlist != null) {
-                                mlist.clear();
-                                mlist.addAll(scanResults);
-                                mPresenter.updateData();
+        if (executor!=null&&!executor.isShutdown()){
+            executor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    final List<ScanResult> scanResults = WifiAdmin.getInstance(mContext).getWifiListWithFilting();
+                    if (scanResults != null) {
+                        mHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (mlist != null) {
+                                    mlist.clear();
+                                    mlist.addAll(scanResults);
+                                    if (mPresenter!=null)
+                                    mPresenter.updateData();
+                                }
                             }
-                        }
-                    });
+                        });
 
+                    }
                 }
-            }
-        });
+            });
+        }
 
     }
 
     @Override
     public void failWifi(String failMsg) {
         Log.d("loadDialog", "failWifi:closeLoadDialog");
-        mPresenter.getViewController().closeLoadDialog();
-        mPresenter.removePassword();
+        if (mPresenter!=null&&mPresenter.getViewController()!=null){
+            mPresenter.getViewController().closeLoadDialog();
+            mPresenter.removePassword();
+        }
         Toast.makeText(mContext, failMsg, Toast.LENGTH_SHORT).show();
+    }
+
+    public void destory(){
+        if (executor!=null&&!executor.isShutdown()){
+            executor.shutdown();
+        }
+        if (mHandler!=null){
+            mHandler.removeCallbacksAndMessages(null);
+        }
     }
 }
