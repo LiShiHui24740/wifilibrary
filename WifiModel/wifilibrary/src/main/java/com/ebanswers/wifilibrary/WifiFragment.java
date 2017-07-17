@@ -1,5 +1,6 @@
 package com.ebanswers.wifilibrary;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.net.wifi.ScanResult;
@@ -39,9 +40,10 @@ import static com.ebanswers.wifilibrary.StyleConfig.TYPE2_NONE;
 
 public class WifiFragment extends Fragment implements IViewController, CompoundButton.OnCheckedChangeListener {
 
-    private Context mContext;
+    private Activity mContext;
     private View mContentView;
     private ImageView back;
+    private ImageView id_iv_wifi;
     private ListView mListView;
     private GridView mGridview;
     private CheckBox mWifiToggle;
@@ -52,8 +54,8 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
     private WifiAdapter2 mWifiAdapter2;
     private PresenterImpl mPresenterImpl;
     private Dialog loadDialog, passwordDialog, disconnectDialog, addWifiDialog;
-    private int layout_type = 2, top_bg_color = 0, top_bg_drawable = 0, top_title_size = 0, top_title_color = 0, item_text_size = 0, item_text_color = 0, bg_color = 0, bg_drawable = 0;
-    private boolean backIsVisible = true;
+    private int layout_type = 2, top_wifi = -1, top_bg_color = 0, top_bg_drawable = 0, top_title_size = 0, top_title_color = 0, item_text_size = 0, item_text_color = 0, bg_color = 0, bg_drawable = 0;
+    private boolean backIsVisible = true, top_wifi_visible = true;
     private int backDrawableId = 0;
     private OnConnectCallBack onConnectCallBack;
     private static StyleConfig.OnBackClickListener onBackClickListener;
@@ -71,6 +73,7 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
         return WifiFragment.getInstance(styleConfig);
     }
 
+
     public static WifiFragment getInstance() {
         return WifiFragment.getInstance(TYPE1_1);
     }
@@ -81,6 +84,8 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
         Bundle bundle = getArguments();
         if (bundle != null) {
             layout_type = bundle.getInt("layout_type");
+            top_wifi_visible = bundle.getBoolean("top_wifi_visible");
+            top_wifi = bundle.getInt("top_wifi");
             top_bg_color = bundle.getInt("top_bg_color");
             backIsVisible = bundle.getBoolean("backIsVisisble");
             top_bg_drawable = bundle.getInt("top_bg_drawable");
@@ -110,7 +115,7 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        mContext = context;
+        mContext = (Activity) context;
     }
 
     @Override
@@ -191,6 +196,15 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
         }
         mWifiToggle = (CheckBox) mContentView.findViewById(R.id.id_cb_toggle);
         back = (ImageView) mContentView.findViewById(R.id.id_tv_wifi_back);
+        id_iv_wifi = (ImageView) mContentView.findViewById(R.id.id_iv_wifi);
+        if (top_wifi_visible) {
+            if (top_wifi != -1) {
+                id_iv_wifi.setImageResource(top_wifi);
+            }
+        } else {
+            id_iv_wifi.setVisibility(View.GONE);
+        }
+
         if (backDrawableId > 0) {
             back.setImageResource(backDrawableId);
         }
@@ -255,18 +269,21 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
 
     @Override
     public void refreshList() {
-        if (mListScanResult.size() > 0) {
-            mTip.setVisibility(View.GONE);
+        if (mContext != null && !mContext.isFinishing()) {
+            if (mListScanResult.size() > 0) {
+                mTip.setVisibility(View.GONE);
+            }
+            if (layout_type == StyleConfig.TYPE1_1 || layout_type == StyleConfig.TYPE1_2 || layout_type == StyleConfig.TYPE1_NONE) {
+                mListView.setVisibility(View.VISIBLE);
+                mWifiAdapter.notifyDataSetChanged();
+                mListView.smoothScrollToPosition(0);
+            } else if (layout_type == StyleConfig.TYPE2_1 || layout_type == StyleConfig.TYPE2_2 || layout_type == StyleConfig.TYPE2_NONE) {
+                mGridview.setVisibility(View.VISIBLE);
+                mWifiAdapter2.notifyDataSetChanged();
+                mGridview.smoothScrollToPosition(0);
+            }
         }
-        if (layout_type == StyleConfig.TYPE1_1 || layout_type == StyleConfig.TYPE1_2 || layout_type == StyleConfig.TYPE1_NONE) {
-            mListView.setVisibility(View.VISIBLE);
-            mWifiAdapter.notifyDataSetChanged();
-            mListView.smoothScrollToPosition(0);
-        } else if (layout_type == StyleConfig.TYPE2_1 || layout_type == StyleConfig.TYPE2_2 || layout_type == StyleConfig.TYPE2_NONE) {
-            mGridview.setVisibility(View.VISIBLE);
-            mWifiAdapter2.notifyDataSetChanged();
-            mGridview.smoothScrollToPosition(0);
-        }
+
 
     }
 

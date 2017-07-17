@@ -2,6 +2,8 @@ package com.ebanswers.wifilibrary;
 
 import android.os.Bundle;
 
+import static android.R.attr.type;
+
 /**
  * @author
  * Created by lishihui on 2017/4/18.
@@ -28,6 +30,14 @@ public class StyleConfig {
 
         public Builder setLayoutType(int type){
             bundle.putInt("layout_type", type);
+            return this;
+        }
+        public Builder setTopWifiIsVisible(boolean flg){
+            bundle.putBoolean("top_wifi_visible", flg);
+            return this;
+        }
+        public Builder setTopWifiDrawable(int Id){
+            bundle.putInt("top_wifi", Id);
             return this;
         }
 
