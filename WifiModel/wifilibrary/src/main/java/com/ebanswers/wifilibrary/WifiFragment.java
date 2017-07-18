@@ -59,6 +59,7 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
     private int backDrawableId = 0;
     private OnConnectCallBack onConnectCallBack;
     private static StyleConfig.OnBackClickListener onBackClickListener;
+    private long connectOutTime = 15000;
 
     public static WifiFragment getInstance(StyleConfig styleConfig) {
         WifiFragment wifiFragment = new WifiFragment();
@@ -106,6 +107,8 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
     public void setOnConnectCallBack(OnConnectCallBack onConnectCallBack) {
         this.onConnectCallBack = onConnectCallBack;
     }
+
+
 
     @Override
     public OnConnectCallBack getOnConnectCallBack() {

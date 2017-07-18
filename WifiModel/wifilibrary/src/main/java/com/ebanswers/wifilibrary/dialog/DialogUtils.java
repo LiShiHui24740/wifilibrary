@@ -151,6 +151,7 @@ public class DialogUtils {
                 alertDialog.show();
             }
         }
+        alertDialog.setCanceledOnTouchOutside(false);
         Window window = alertDialog.getWindow();
         window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         int width = activity.getResources().getDisplayMetrics().widthPixels;

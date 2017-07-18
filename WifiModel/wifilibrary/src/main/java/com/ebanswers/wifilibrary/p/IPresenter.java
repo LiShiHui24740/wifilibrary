@@ -19,6 +19,8 @@ public interface IPresenter {
     void addWifi();
     void disconnect();
     void savePassword(String ssid);
+    void startConnectOutTime();
+    void cancelConnectOutTime();
     void removePassword();
     void destory();
     IViewController getViewController();

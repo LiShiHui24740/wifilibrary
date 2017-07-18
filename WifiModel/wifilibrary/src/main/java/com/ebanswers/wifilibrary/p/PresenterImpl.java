@@ -3,9 +3,13 @@ package com.ebanswers.wifilibrary.p;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.net.wifi.ScanResult;
+import android.os.CountDownTimer;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.Toast;
 
+import com.ebanswers.wifilibrary.ConnetParamsConfig;
 import com.ebanswers.wifilibrary.NetUtils;
 import com.ebanswers.wifilibrary.WifiAdmin;
 import com.ebanswers.wifilibrary.WifiConfig;
@@ -15,6 +19,8 @@ import com.ebanswers.wifilibrary.m.ModelControllerImpl;
 import com.ebanswers.wifilibrary.v.IViewController;
 
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -29,8 +35,10 @@ public class PresenterImpl implements IPresenter {
     private ModelControllerImpl modelController;
     private ExecutorService threadPool = Executors.newCachedThreadPool();
     private String current_ssid, current_password;
+    private CountDownTimer timer;
+    private int currentId;
 
-    public PresenterImpl(Context context, IViewController controller, List<ScanResult> list) {
+    public PresenterImpl(Context context, final IViewController controller, List<ScanResult> list) {
         mContext = context.getApplicationContext();
         this.viewController = controller;
         modelController = new ModelControllerImpl(mContext, this, list);
@@ -65,10 +73,11 @@ public class PresenterImpl implements IPresenter {
 
     }
 
+
     @Override
     public void openWifiAndScan(final List<ScanResult> list) {
         if (viewController != null)
-        viewController.showOpenTip();
+            viewController.showOpenTip();
         scan();
     }
 
@@ -85,7 +94,7 @@ public class PresenterImpl implements IPresenter {
     @Override
     public void closeSystemWifi() {
         if (viewController != null)
-        viewController.showCloseTip();
+            viewController.showCloseTip();
         WifiAdmin.getInstance(mContext).closeWifi();
     }
 
@@ -122,7 +131,7 @@ public class PresenterImpl implements IPresenter {
         } else {
             final String security = scanResult.capabilities.toLowerCase();
             if (!security.contains("wpa") && !security.contains("wep")) {
-                connectWifi(scanResult.SSID, "", "");
+                currentId = connectWifi(scanResult.SSID, "", "");
             } else {
                 if (viewController != null) {
                     viewController.showInputPasswordDialog(scanResult, new DialogUtils.DialogCallBack() {
@@ -132,9 +141,9 @@ public class PresenterImpl implements IPresenter {
                             current_ssid = scanResult.SSID;
                             current_password = passward;
                             if (security.contains("wpa")) {
-                                connectWifi(scanResult.SSID, passward, "wpa");
+                                currentId = connectWifi(scanResult.SSID, passward, "wpa");
                             } else if (security.contains("wep")) {
-                                connectWifi(scanResult.SSID, passward, "wep");
+                                currentId = connectWifi(scanResult.SSID, passward, "wep");
                             }
                         }
 
@@ -158,19 +167,20 @@ public class PresenterImpl implements IPresenter {
 
     }
 
-    private void connectWifi(String ssid, String password, String secrity) {
+    private int connectWifi(String ssid, String password, String secrity) {
         int netId = WifiAdmin.getInstance(mContext).IsConfiguration("\"" + ssid + "\"");
         if (netId != -1) {
             WifiAdmin.getInstance(mContext).ConnectWifi(netId);
         } else {
             if (TextUtils.isEmpty(secrity)) {
-                WifiAdmin.getInstance(mContext).addNetwork(WifiAdmin.getInstance(mContext).createWifiInfo(ssid, "", 1), true);
+                netId = WifiAdmin.getInstance(mContext).addNetwork(WifiAdmin.getInstance(mContext).createWifiInfo(ssid, "", 1), true);
             } else if (secrity.equals("wpa")) {
-                WifiAdmin.getInstance(mContext).addNetwork(WifiAdmin.getInstance(mContext).createWifiInfo(ssid, password, 3), true);
+                netId = WifiAdmin.getInstance(mContext).addNetwork(WifiAdmin.getInstance(mContext).createWifiInfo(ssid, password, 3), true);
             } else if (secrity.equals("wep")) {
-                WifiAdmin.getInstance(mContext).addNetwork(WifiAdmin.getInstance(mContext).createWifiInfo(ssid, password, 2), true);
+                netId = WifiAdmin.getInstance(mContext).addNetwork(WifiAdmin.getInstance(mContext).createWifiInfo(ssid, password, 2), true);
             }
         }
+        return netId;
     }
 
 
@@ -219,8 +229,41 @@ public class PresenterImpl implements IPresenter {
     }
 
     @Override
+    public void startConnectOutTime() {
+        if (timer == null) {
+            timer = new CountDownTimer(ConnetParamsConfig.getConnectOutTime(), 1000) {
+                @Override
+                public void onTick(long millisUntilFinished) {
+
+                }
+
+                @Override
+                public void onFinish() {
+                    WifiAdmin.getInstance(mContext).disconnectWifi(currentId);
+                    viewController.closeLoadDialog();
+                    cancelConnectOutTime();
+                    if (ConnetParamsConfig.getConnectOutTimeCallBack() == null)
+                        Toast.makeText(mContext, "连接超时", Toast.LENGTH_SHORT).show();
+                    else
+                        ConnetParamsConfig.getConnectOutTimeCallBack().onConnectOutTime();
+                }
+            };
+            timer.start();
+        }
+    }
+
+    @Override
+    public void cancelConnectOutTime() {
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
+        }
+    }
+
+    @Override
     public void removePassword() {
         WifiConfig.getInstance(mContext).removePasswd(current_ssid);
+        WifiAdmin.getInstance(mContext).removeWifi("\"" + current_ssid + "\"");
     }
 
 

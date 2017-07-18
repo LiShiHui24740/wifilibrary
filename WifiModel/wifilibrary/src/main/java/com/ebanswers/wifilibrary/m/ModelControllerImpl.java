@@ -49,6 +49,7 @@ public class ModelControllerImpl implements WifiReceiver.WifiStateChange {
         Log.d("loadDialog", "openingWifi");
         if (mPresenter!=null&&mPresenter.getViewController()!=null){
             mPresenter.getViewController().showLoadDialog();
+            mPresenter.startConnectOutTime();
             if (mPresenter.getViewController().getOnConnectCallBack() != null) {
                 mPresenter.getViewController().getOnConnectCallBack().connectResult(mlist.get(0));
             }
@@ -62,8 +63,11 @@ public class ModelControllerImpl implements WifiReceiver.WifiStateChange {
     @Override
     public void connectWifi() {
         Log.d("loadDialog", "connectWifi:closeLoadDialog");
-        if (mPresenter!=null&&mPresenter.getViewController()!=null)
-        mPresenter.getViewController().closeLoadDialog();
+        if (mPresenter!=null&&mPresenter.getViewController()!=null){
+            mPresenter.getViewController().closeLoadDialog();
+            mPresenter.cancelConnectOutTime();
+        }
+
     }
 
     @Override
@@ -104,6 +108,7 @@ public class ModelControllerImpl implements WifiReceiver.WifiStateChange {
         if (mPresenter!=null&&mPresenter.getViewController()!=null){
             mPresenter.getViewController().closeLoadDialog();
             mPresenter.removePassword();
+            mPresenter.cancelConnectOutTime();
         }
         Toast.makeText(mContext, failMsg, Toast.LENGTH_SHORT).show();
     }
