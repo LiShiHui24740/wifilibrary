@@ -24,11 +24,13 @@ public class ModelControllerImpl implements WifiReceiver.WifiStateChange {
     private Context mContext;
     private ExecutorService executor = Executors.newSingleThreadExecutor();
     private Handler mHandler = new Handler();
+    private Toast toast;
 
     public ModelControllerImpl(Context context, IPresenter presenter, List<ScanResult> mlist) {
         mContext = context;
         mPresenter = presenter;
         this.mlist = mlist;
+        toast = Toast.makeText(context, "", Toast.LENGTH_SHORT);
     }
 
     @Override
@@ -47,11 +49,12 @@ public class ModelControllerImpl implements WifiReceiver.WifiStateChange {
     @Override
     public void connectingWifi() {
         Log.d("loadDialog", "openingWifi");
-        if (mPresenter!=null&&mPresenter.getViewController()!=null){
+        if (mPresenter != null && mPresenter.getViewController() != null) {
             mPresenter.getViewController().showLoadDialog();
             mPresenter.startConnectOutTime();
             if (mPresenter.getViewController().getOnConnectCallBack() != null) {
-                mPresenter.getViewController().getOnConnectCallBack().connectResult(mlist.get(0));
+                if (mlist != null && mlist.size() > 0)
+                    mPresenter.getViewController().getOnConnectCallBack().connectResult(mlist.get(0));
             }
         }
 
@@ -63,7 +66,7 @@ public class ModelControllerImpl implements WifiReceiver.WifiStateChange {
     @Override
     public void connectWifi() {
         Log.d("loadDialog", "connectWifi:closeLoadDialog");
-        if (mPresenter!=null&&mPresenter.getViewController()!=null){
+        if (mPresenter != null && mPresenter.getViewController() != null) {
             mPresenter.getViewController().closeLoadDialog();
             mPresenter.cancelConnectOutTime();
         }
@@ -77,24 +80,23 @@ public class ModelControllerImpl implements WifiReceiver.WifiStateChange {
 
     @Override
     public void updateWifiList() {
-        if (executor!=null&&!executor.isShutdown()){
+        if (executor != null && !executor.isShutdown()) {
             executor.execute(new Runnable() {
                 @Override
                 public void run() {
                     final List<ScanResult> scanResults = WifiAdmin.getInstance(mContext).getWifiListWithFilting();
+                    if (mlist != null) {
+                        mlist.clear();
+                        mlist.addAll(scanResults);
+                    }
                     if (scanResults != null) {
                         mHandler.post(new Runnable() {
                             @Override
                             public void run() {
-                                if (mlist != null) {
-                                    mlist.clear();
-                                    mlist.addAll(scanResults);
-                                    if (mPresenter!=null)
+                                if (mPresenter != null)
                                     mPresenter.updateData();
-                                }
                             }
                         });
-
                     }
                 }
             });
@@ -105,19 +107,20 @@ public class ModelControllerImpl implements WifiReceiver.WifiStateChange {
     @Override
     public void failWifi(String failMsg) {
         Log.d("loadDialog", "failWifi:closeLoadDialog");
-        if (mPresenter!=null&&mPresenter.getViewController()!=null){
+        if (mPresenter != null && mPresenter.getViewController() != null) {
             mPresenter.getViewController().closeLoadDialog();
             mPresenter.removePassword();
             mPresenter.cancelConnectOutTime();
         }
-        Toast.makeText(mContext, failMsg, Toast.LENGTH_SHORT).show();
+        toast.setText(failMsg);
+        toast.show();
     }
 
-    public void destory(){
-        if (executor!=null&&!executor.isShutdown()){
+    public void destory() {
+        if (executor != null && !executor.isShutdown()) {
             executor.shutdown();
         }
-        if (mHandler!=null){
+        if (mHandler != null) {
             mHandler.removeCallbacksAndMessages(null);
         }
     }

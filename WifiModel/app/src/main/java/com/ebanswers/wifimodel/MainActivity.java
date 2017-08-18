@@ -4,8 +4,13 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
 
+import com.ebanswers.wifilibrary.NetWorkSpeedUtils;
 import com.ebanswers.wifilibrary.StyleConfig;
+import com.ebanswers.wifilibrary.WifiAdmin;
 import com.ebanswers.wifilibrary.WifiFragment;
 
 public class MainActivity extends AppCompatActivity {
@@ -16,7 +21,19 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        final Button button = (Button) findViewById(R.id.id_btn);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NetWorkSpeedUtils.startShowNetSpeed(MainActivity.this, new NetWorkSpeedUtils.onNetSpeedResultlistener() {
+                    @Override
+                    public void speed(int rssi, final long speed) {
+                        button.setText(speed + "kb/s");
+                    }
+                });
+                button.setEnabled(false);
+            }
+        });
         fragmentManager = getSupportFragmentManager();
 
         /**
@@ -38,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
                 finish();
             }
         });
+
         fragmentManager.beginTransaction().replace(R.id.id_fl_container, WifiFragment.getInstance(styleConfig)).commitAllowingStateLoss();
     }
 }

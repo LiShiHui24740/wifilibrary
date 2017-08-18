@@ -100,7 +100,7 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
         }
     }
 
-    private WifiFragment() {
+    public WifiFragment() {
     }
 
 
@@ -273,7 +273,7 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
     @Override
     public void refreshList() {
         if (mContext != null && !mContext.isFinishing()) {
-            if (mListScanResult.size() > 0) {
+            if (mListScanResult.size() > 0&&WifiAdmin.getInstance(mContext).isWifiEnable()) {
                 mTip.setVisibility(View.GONE);
             }
             if (layout_type == StyleConfig.TYPE1_1 || layout_type == StyleConfig.TYPE1_2 || layout_type == StyleConfig.TYPE1_NONE) {
@@ -300,7 +300,7 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
 
     @Override
     public void closeInputPasswordDialog() {
-        if (passwordDialog != null) {
+        if (passwordDialog != null&&mContext!=null&&!mContext.isFinishing()) {
             if (passwordDialog.isShowing())
                 passwordDialog.dismiss();
         }
@@ -317,7 +317,7 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
 
     @Override
     public void closeDisconnectDialog() {
-        if (disconnectDialog != null) {
+        if (disconnectDialog != null&&mContext!=null&&!mContext.isFinishing()) {
             if (disconnectDialog.isShowing())
                 disconnectDialog.dismiss();
         }
@@ -337,7 +337,7 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
 
     @Override
     public void closeLoadDialog() {
-        if (loadDialog != null) {
+        if (loadDialog != null&&mContext!=null&&!mContext.isFinishing()) {
             if (loadDialog.isShowing())
                 loadDialog.dismiss();
         }

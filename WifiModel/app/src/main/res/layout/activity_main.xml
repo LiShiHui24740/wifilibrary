@@ -4,8 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context="com.ebanswers.wifimodel.MainActivity"
     >
+    <Button
+        android:id="@+id/id_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="获取网速"/>
     <FrameLayout
         android:id="@+id/id_fl_container"
         android:layout_width="match_parent"

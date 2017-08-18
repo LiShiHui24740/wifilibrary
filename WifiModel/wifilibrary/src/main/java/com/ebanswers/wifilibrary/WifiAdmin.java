@@ -11,6 +11,7 @@ import android.util.Log;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -61,7 +62,7 @@ public class WifiAdmin {
     public int IsConfiguration(String SSID) {
         List<WifiConfiguration> wifiConfigList = mWifiManager.getConfiguredNetworks();
         if (wifiConfigList != null) {
-            for (int i = 0, n = wifiConfigList.size();i < n; i++) {
+            for (int i = 0, n = wifiConfigList.size(); i < n; i++) {
                 if (wifiConfigList.get(i).SSID.equals(SSID)) {//地址相同
                     return wifiConfigList.get(i).networkId;
                 }
@@ -144,7 +145,6 @@ public class WifiAdmin {
     }
 
 
-
     public void removeWifi(String ssid, int netId) {
         int id = IsConfiguration(ssid);
         Log.d("lishihuiId", "id:" + id + ",netId:" + netId);
@@ -165,6 +165,24 @@ public class WifiAdmin {
         }
     }
 
+    public int getLinkSpeed(){
+        if (mWifiInfo!=null){
+           return mWifiInfo.getLinkSpeed();
+        }
+        return -1;
+    }
+
+    /**
+     * 得到的值是一个0到-100的区间值，是一个int型数据，其中0到-50表示信号最好，
+     * -50到-70表示信号偏差，小于-70表示最差，有可能连接不上或者掉线。
+     * @return
+     */
+    public int getRssi(){
+        if (mWifiInfo!=null){
+          return  mWifiInfo.getRssi();
+        }
+        return -100;
+    }
 
     /**
      * 连接指定配置好的网络
@@ -403,7 +421,7 @@ public class WifiAdmin {
         }
     }
 
-    private void updateWifiList() {
+    private synchronized void updateWifiList() {
         if (mWifiList != null) {
             mWifiList.clear();
             List<ScanResult> list = mWifiManager.getScanResults();
@@ -412,7 +430,7 @@ public class WifiAdmin {
         }
     }
 
-    public void updateConfigure() {
+    public synchronized void updateConfigure() {
         if (mWifiConfiguration != null) {
             mWifiConfiguration.clear();
             List<WifiConfiguration> list = mWifiManager.getConfiguredNetworks();
@@ -421,67 +439,48 @@ public class WifiAdmin {
         }
     }
 
-    public List<ScanResult> getWifiListWithFilting() {
+    public synchronized List<ScanResult> getWifiListWithFilting() {
         updateWifiList();
-        boolean tf;
-        ScanResult currentResult = null;
-        if (mWifiList != null && filterWifiLists != null) {
+        if (mWifiList != null) {
             ArrayList<ScanResult> removeList = new ArrayList<>();
-            ArrayList<ScanResult> addList = new ArrayList<>();
-            for (ScanResult result : mWifiList) {
-                if (!TextUtils.isEmpty(result.SSID)) {
-                    tf = false;
-                    for (ScanResult r : filterWifiLists) {
-                        if (r.SSID.equals(result.SSID)) {
-                            tf = true;
-                            int level1 = WifiManager.calculateSignalLevel(r.level, 4);
-                            int level2 = WifiManager.calculateSignalLevel(result.level, 4);
-                            if (level1 < level2) {
-                                removeList.add(r);
-                                addList.add(result);
+            ScanResult connect_scanResult = null;
+            int size = mWifiList.size();
+            for (int i = 0; i < size; i++) {
+                if (TextUtils.isEmpty(mWifiList.get(i).SSID)) {
+                    removeList.add(mWifiList.get(i));
+                } else {
+                    for (int j = i + 1; j < size; j++) {
+                        if (mWifiList.get(i).SSID.equals(mWifiList.get(j).SSID)) {
+                            if (mWifiList.get(i).BSSID.equals(mWifiList.get(j).BSSID)) {
+                                removeList.add(mWifiList.get(i));
                             }
-                            break;
                         }
                     }
-                    if (result.BSSID.equals(getBSSID())) {
-                        currentResult = result;
-                    }
-
-                    if (!tf) {
-                        filterWifiLists.add(result);
+                }
+            }
+            mWifiList.removeAll(removeList);
+            removeList.clear();
+            for (ScanResult scanResult : mWifiList) {
+                if (scanResult.BSSID.equals(getBSSID())) {
+                    if (connect_scanResult != null) {
+                        removeList.add(scanResult);
+                    } else {
+                        connect_scanResult = scanResult;
                     }
                 }
             }
-            filterWifiLists.removeAll(removeList);
-            filterWifiLists.addAll(addList);
-            if (currentResult != null) {
-                ArrayList<ScanResult> removeList1 = new ArrayList<>();
-                for (ScanResult filter : filterWifiLists) {
-                    if (filter.SSID.equals(currentResult.SSID)) {
-                        removeList1.add(filter);
-                        break;
-                    }
-                }
-                filterWifiLists.removeAll(removeList1);
-                filterWifiLists.add(currentResult);
-            }
-
-            ScanResult connect_scanResult = null;
-            for (ScanResult result : filterWifiLists) {
-                if (result.BSSID.equals(getBSSID())) {
-                    connect_scanResult = result;
-                    break;
-                }
-            }
-
+            mWifiList.removeAll(removeList);
             if (connect_scanResult != null) {
-                filterWifiLists.remove(connect_scanResult);
-                filterWifiLists.add(0, connect_scanResult);
+                mWifiList.remove(connect_scanResult);
+                mWifiList.add(0, connect_scanResult);
             }
-
         }
-
+        if (filterWifiLists != null) {
+            filterWifiLists.clear();
+            filterWifiLists.addAll(mWifiList);
+        }
         return filterWifiLists;
+
     }
 
 
