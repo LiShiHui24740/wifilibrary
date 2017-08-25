@@ -65,8 +65,6 @@ public class WifiAdapter2 extends BaseAdapter {
         }
         ScanResult result = getItem(position);
         if (result.BSSID.equals(WifiAdmin.getInstance(parent.getContext()).getBSSID()) && NetUtils.isWifi(parent.getContext())) {
-            Log.d("netId", "result.BSSID：" + result.BSSID);
-            Log.d("netId", "WifiAdmin.getInstance(parent.getContext()).getNetworkId()：" + WifiAdmin.getInstance(parent.getContext()).getNetworkId());
             if (mPresenter != null)
                 mPresenter.savePassword(result.SSID);
             viewHolder.connected.setVisibility(View.VISIBLE);

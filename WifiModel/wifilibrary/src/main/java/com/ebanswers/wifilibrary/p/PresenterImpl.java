@@ -112,7 +112,8 @@ public class PresenterImpl implements IPresenter {
                             WifiAdmin.getInstance(mContext).disconnectWifi(id);
                             WifiAdmin.getInstance(mContext).removeWifi("\"" + scanResult.SSID + "\"", id);
                         }
-                        viewController.closeDisconnectDialog();
+                        if (viewController != null)
+                            viewController.closeDisconnectDialog();
 
                     }
 
@@ -123,7 +124,8 @@ public class PresenterImpl implements IPresenter {
 
                     @Override
                     public void cancel() {
-                        viewController.closeDisconnectDialog();
+                        if (viewController != null)
+                            viewController.closeDisconnectDialog();
                     }
                 });
             }
@@ -137,7 +139,8 @@ public class PresenterImpl implements IPresenter {
                     viewController.showInputPasswordDialog(scanResult, new DialogUtils.DialogCallBack() {
                         @Override
                         public void callBack(View view, ScanResult scanResult, String passward) {
-                            viewController.closeInputPasswordDialog();
+                            if (viewController != null)
+                                viewController.closeInputPasswordDialog();
                             current_ssid = scanResult.SSID;
                             current_password = passward;
                             if (security.contains("wpa")) {
@@ -149,14 +152,16 @@ public class PresenterImpl implements IPresenter {
 
                         @Override
                         public void ignore() {
-                            viewController.closeInputPasswordDialog();
+                            if (viewController != null)
+                                viewController.closeInputPasswordDialog();
                             WifiConfig.getInstance(mContext).removePasswd(scanResult.SSID);
                             WifiAdmin.getInstance(mContext).removeWifi("\"" + scanResult.SSID + "\"");
                         }
 
                         @Override
                         public void cancel() {
-                            viewController.closeInputPasswordDialog();
+                            if (viewController != null)
+                                viewController.closeInputPasswordDialog();
                         }
                     });
                 }
@@ -196,7 +201,8 @@ public class PresenterImpl implements IPresenter {
             viewController.showAddWifiDialog(new DialogUtils.DialogAddWifiCallBack() {
                 @Override
                 public void callBack(String ssid, String password, int type) {
-                    viewController.closeAddWifiDialog();
+                    if (viewController != null)
+                        viewController.closeAddWifiDialog();
                     current_ssid = ssid;
                     current_password = password;
                     int netId = WifiAdmin.getInstance(mContext).IsConfiguration("\"" + ssid + "\"");
@@ -209,7 +215,8 @@ public class PresenterImpl implements IPresenter {
 
                 @Override
                 public void cancel() {
-                    viewController.closeAddWifiDialog();
+                    if (viewController != null)
+                        viewController.closeAddWifiDialog();
                 }
 
             });
@@ -240,7 +247,8 @@ public class PresenterImpl implements IPresenter {
                 @Override
                 public void onFinish() {
                     WifiAdmin.getInstance(mContext).disconnectWifi(currentId);
-                    viewController.closeLoadDialog();
+                    if (viewController != null)
+                        viewController.closeLoadDialog();
                     cancelConnectOutTime();
                     if (ConnetParamsConfig.getConnectOutTimeCallBack() == null)
                         Toast.makeText(mContext, "连接超时", Toast.LENGTH_SHORT).show();

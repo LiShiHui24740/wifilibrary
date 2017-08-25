@@ -85,14 +85,14 @@ public class ModelControllerImpl implements WifiReceiver.WifiStateChange {
                 @Override
                 public void run() {
                     final List<ScanResult> scanResults = WifiAdmin.getInstance(mContext).getWifiListWithFilting();
-                    if (mlist != null) {
-                        mlist.clear();
-                        mlist.addAll(scanResults);
-                    }
                     if (scanResults != null) {
                         mHandler.post(new Runnable() {
                             @Override
                             public void run() {
+                                if (mlist != null) {
+                                    mlist.clear();
+                                    mlist.addAll(scanResults);
+                                }
                                 if (mPresenter != null)
                                     mPresenter.updateData();
                             }
