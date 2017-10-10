@@ -70,10 +70,13 @@ public class NetWorkSpeedUtils {
     private static long showNetSpeed(Context context) {
         long nowTotalRxBytes = getTotalRxBytes(context);
         long nowTimeStamp = System.currentTimeMillis();
-        long speed = ((nowTotalRxBytes - lastTotalRxBytes) * 1000 / (nowTimeStamp - lastTimeStamp));//毫秒转换
-        lastTimeStamp = nowTimeStamp;
-        lastTotalRxBytes = nowTotalRxBytes;
-        return speed;
+        if (nowTimeStamp - lastTimeStamp > 0) {
+            long speed = ((nowTotalRxBytes - lastTotalRxBytes) * 1000 / (nowTimeStamp - lastTimeStamp));//毫秒转换
+            lastTimeStamp = nowTimeStamp;
+            lastTotalRxBytes = nowTotalRxBytes;
+            return speed;
+        }
+        return 0;
     }
 
     public interface onNetSpeedResultlistener {

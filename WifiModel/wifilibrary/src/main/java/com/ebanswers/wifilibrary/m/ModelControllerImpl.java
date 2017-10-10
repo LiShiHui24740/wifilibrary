@@ -35,12 +35,16 @@ public class ModelControllerImpl implements WifiReceiver.WifiStateChange {
 
     @Override
     public void openWifi() {
-
+        if (mPresenter.getViewController() != null) {
+            mPresenter.getViewController().openToggle();
+        }
     }
 
     @Override
     public void closeWifi() {
-
+        if (mPresenter.getViewController() != null) {
+            mPresenter.getViewController().closeToggle();
+        }
     }
 
     /**

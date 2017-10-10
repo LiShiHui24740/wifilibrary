@@ -54,7 +54,7 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
     private WifiAdapter2 mWifiAdapter2;
     private PresenterImpl mPresenterImpl;
     private Dialog loadDialog, passwordDialog, disconnectDialog, addWifiDialog;
-    private int layout_type = 2, top_wifi = -1, top_bg_color = 0, top_bg_drawable = 0, top_title_size = 0, top_title_color = 0, item_text_size = 0, item_text_color = 0, bg_color = 0, bg_drawable = 0;
+    private int layout_type = 2, top_wifi = -1, top_bg_color = 0, top_bg_drawable = 0, top_title_size = 0, top_title_color = 0, tip_size = 0, tip_color = 0, item_text_size = 0, item_text_color = 0, bg_color = 0, bg_drawable = 0;
     private boolean backIsVisible = true, top_wifi_visible = true;
     private int backDrawableId = 0;
     private OnConnectCallBack onConnectCallBack;
@@ -92,6 +92,8 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
             top_bg_drawable = bundle.getInt("top_bg_drawable");
             top_title_size = bundle.getInt("top_title_size");
             top_title_color = bundle.getInt("top_title_color");
+            tip_size = bundle.getInt("tipSize");
+            tip_color = bundle.getInt("tipColor");
             item_text_size = bundle.getInt("item_text_size");
             item_text_color = bundle.getInt("item_text_color");
             bg_color = bundle.getInt("background_color");
@@ -107,7 +109,6 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
     public void setOnConnectCallBack(OnConnectCallBack onConnectCallBack) {
         this.onConnectCallBack = onConnectCallBack;
     }
-
 
 
     @Override
@@ -266,6 +267,13 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
                 type1_bg_color_rl.setBackgroundColor(bg_color);
             }
         }
+
+        if (tip_size != 0) {
+            mTip.setTextSize(tip_size);
+        }
+        if (tip_color != 0) {
+            mTip.setTextColor(tip_color);
+        }
         add_wifi = (LinearLayout) mContentView.findViewById(R.id.id_ll_wifi_add);
         search_wifi = (LinearLayout) mContentView.findViewById(R.id.id_ll_wifi_search);
     }
@@ -273,7 +281,7 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
     @Override
     public void refreshList() {
         if (mContext != null && !mContext.isFinishing()) {
-            if (mListScanResult.size() > 0&&WifiAdmin.getInstance(mContext).isWifiEnable()) {
+            if (mListScanResult.size() > 0 && WifiAdmin.getInstance(mContext).isWifiEnable()) {
                 mTip.setVisibility(View.GONE);
             }
             if (layout_type == StyleConfig.TYPE1_1 || layout_type == StyleConfig.TYPE1_2 || layout_type == StyleConfig.TYPE1_NONE) {
@@ -300,7 +308,7 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
 
     @Override
     public void closeInputPasswordDialog() {
-        if (passwordDialog != null&&mContext!=null&&!mContext.isFinishing()) {
+        if (passwordDialog != null && mContext != null && !mContext.isFinishing()) {
             if (passwordDialog.isShowing())
                 passwordDialog.dismiss();
         }
@@ -317,7 +325,7 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
 
     @Override
     public void closeDisconnectDialog() {
-        if (disconnectDialog != null&&mContext!=null&&!mContext.isFinishing()) {
+        if (disconnectDialog != null && mContext != null && !mContext.isFinishing()) {
             if (disconnectDialog.isShowing())
                 disconnectDialog.dismiss();
         }
@@ -337,7 +345,7 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
 
     @Override
     public void closeLoadDialog() {
-        if (loadDialog != null&&mContext!=null&&!mContext.isFinishing()) {
+        if (loadDialog != null && mContext != null && !mContext.isFinishing()) {
             if (loadDialog.isShowing())
                 loadDialog.dismiss();
         }
@@ -364,7 +372,6 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
     @Override
     public void openToggle() {
         mWifiToggle.setChecked(true);
-        mWifiToggle.setBackgroundResource(R.drawable.ic_set_on);
         add_wifi.setVisibility(View.VISIBLE);
         search_wifi.setVisibility(View.VISIBLE);
     }
@@ -372,14 +379,12 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
     @Override
     public void closeToggle() {
         mWifiToggle.setChecked(false);
-        mWifiToggle.setBackgroundResource(R.drawable.ic_set_off);
         add_wifi.setVisibility(View.GONE);
         search_wifi.setVisibility(View.GONE);
+        hideList();
     }
 
-
-    @Override
-    public void showOpenTip() {
+    private void hideList() {
         if (layout_type == StyleConfig.TYPE1_1 || layout_type == StyleConfig.TYPE1_2 || layout_type == StyleConfig.TYPE1_NONE) {
             mListView.setVisibility(View.INVISIBLE);
         } else if (layout_type == StyleConfig.TYPE2_1 || layout_type == StyleConfig.TYPE2_2 || layout_type == StyleConfig.TYPE2_NONE) {
@@ -387,6 +392,12 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
         } else {
             mListView.setVisibility(View.INVISIBLE);
         }
+    }
+
+
+    @Override
+    public void showOpenTip() {
+        hideList();
         mTip.setText(R.string.scaning_wifi);
         mTip.setVisibility(View.VISIBLE);
     }
@@ -413,7 +424,6 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         if (isChecked) {
-            openToggle();
             mPresenterImpl.openWifiAndScan(mListScanResult);
             add_wifi.setVisibility(View.VISIBLE);
             search_wifi.setVisibility(View.VISIBLE);
@@ -421,7 +431,6 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
                 onConnectCallBack.isWifiEnable(true);
             }
         } else {
-            closeToggle();
             mPresenterImpl.closeSystemWifi();
             add_wifi.setVisibility(View.GONE);
             search_wifi.setVisibility(View.GONE);
