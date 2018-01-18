@@ -2,6 +2,7 @@ package com.ebanswers.wifilibrary.p;
 
 import android.net.wifi.ScanResult;
 
+import com.ebanswers.wifilibrary.StyleConfig;
 import com.ebanswers.wifilibrary.v.IViewController;
 
 import java.util.List;
@@ -19,9 +20,12 @@ public interface IPresenter {
     void addWifi();
     void disconnect();
     void savePassword(String ssid);
+    String getPassWord(String ssid);
     void startConnectOutTime();
     void cancelConnectOutTime();
     void removePassword();
+    void setOnConnectedWifiListener(StyleConfig.OnConnectedWifiListener onConnectedWifiListener);
+    StyleConfig.OnConnectedWifiListener getOnConnectedWifiListener();
     void destory();
     IViewController getViewController();
 }

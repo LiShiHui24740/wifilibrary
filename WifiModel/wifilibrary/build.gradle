@@ -7,8 +7,8 @@ android {
     defaultConfig {
         minSdkVersion 17
         targetSdkVersion 22
-        versionCode 27
-        versionName "1.4.4"
+        versionCode 31
+        versionName "1.4.8"
 
     }
     buildTypes {
@@ -22,6 +22,8 @@ android {
 }
 
 dependencies {
+
+
     compile fileTree(dir: 'libs', include: ['*.jar'])
     provided 'com.android.support:appcompat-v7:25.3.1'
 }

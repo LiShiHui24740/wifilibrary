@@ -25,8 +25,9 @@ import java.util.List;
 public class WifiAdapter extends BaseAdapter {
     private List<ScanResult> mList;
     private IPresenter mPresenter;
-    private int textSize,textColor;
-    public WifiAdapter(List<ScanResult> mList,int itemTextSize,int item_text_color,IPresenter presenter) {
+    private int textSize, textColor;
+
+    public WifiAdapter(List<ScanResult> mList, int itemTextSize, int item_text_color, IPresenter presenter) {
         this.mList = mList;
         mPresenter = presenter;
         textSize = itemTextSize;
@@ -64,20 +65,20 @@ public class WifiAdapter extends BaseAdapter {
         }
         ScanResult result = getItem(position);
         if (result.BSSID.equals(WifiAdmin.getInstance(parent.getContext()).getBSSID()) && NetUtils.isWifi(parent.getContext())) {
-            if (mPresenter!=null)
-            mPresenter.savePassword(result.SSID);
+            if (mPresenter != null && TextUtils.isEmpty(mPresenter.getPassWord(result.SSID)))
+                mPresenter.savePassword(result.SSID);
             viewHolder.connected.setVisibility(View.VISIBLE);
         } else {
             viewHolder.connected.setVisibility(View.INVISIBLE);
         }
-        if (textSize!=0){
-            viewHolder.name.setTextSize(TypedValue.COMPLEX_UNIT_SP,textSize);
+        if (textSize != 0) {
+            viewHolder.name.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize);
         }
-        if (textColor!=0){
+        if (textColor != 0) {
             viewHolder.name.setTextColor(textColor);
         }
         viewHolder.name.setText(result.SSID);
-        String security = "" ;
+        String security = "";
         if (!TextUtils.isEmpty(result.capabilities))
             security = result.capabilities.toLowerCase();
         if (security.contains("wpa")) {

@@ -43,7 +43,7 @@ public class WifiConfig {
      */
     public void savePasswd(String ssid, String passwd) {
         SharedPreferences.Editor edit = sharedPrefs.edit();
-        edit.putString(ssid, passwd);
+        edit.putString(ssid.trim(), passwd);
         edit.apply();
     }
 
@@ -53,7 +53,7 @@ public class WifiConfig {
      * @param ssid wifi名称
      */
     public String getPasswd(String ssid) {
-        return sharedPrefs.getString(ssid, "");
+        return sharedPrefs.getString(ssid.trim(), "");
     }
 
     /**

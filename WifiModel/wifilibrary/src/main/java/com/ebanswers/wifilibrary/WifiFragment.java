@@ -59,7 +59,7 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
     private int backDrawableId = 0;
     private OnConnectCallBack onConnectCallBack;
     private static StyleConfig.OnBackClickListener onBackClickListener;
-    private long connectOutTime = 15000;
+    private static StyleConfig.OnConnectedWifiListener onConnectedWifiListener;
 
     public static WifiFragment getInstance(StyleConfig styleConfig) {
         WifiFragment wifiFragment = new WifiFragment();
@@ -179,6 +179,9 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
                 mPresenterImpl.init(mListScanResult);
             }
         });
+        if (onConnectedWifiListener!=null){
+            mPresenterImpl.setOnConnectedWifiListener(onConnectedWifiListener);
+        }
     }
 
     @Override
@@ -440,17 +443,22 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
         }
     }
 
-    public static void setOnBackClickListener(StyleConfig.OnBackClickListener listener) {
+    public void setOnBackClickListener(StyleConfig.OnBackClickListener listener) {
         onBackClickListener = listener;
+    }
+
+    public  void setOnConnectedWifiListener(StyleConfig.OnConnectedWifiListener listener) {
+        onConnectedWifiListener = listener;
     }
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         closeLoadDialog();
         mPresenterImpl.destory();
         mPresenterImpl = null;
         onBackClickListener = null;
+        onConnectedWifiListener = null;
+        super.onDestroy();
     }
 
     public interface OnConnectCallBack {

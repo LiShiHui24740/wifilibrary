@@ -111,4 +111,8 @@ public class StyleConfig {
     public interface OnBackClickListener {
         void onClick();
     }
+
+    public interface OnConnectedWifiListener {
+        void onConnected();
+    }
 }

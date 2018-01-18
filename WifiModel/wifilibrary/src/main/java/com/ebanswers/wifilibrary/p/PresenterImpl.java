@@ -7,10 +7,12 @@ import android.os.CountDownTimer;
 import android.os.Handler;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ebanswers.wifilibrary.ConnetParamsConfig;
 import com.ebanswers.wifilibrary.NetUtils;
+import com.ebanswers.wifilibrary.StyleConfig;
 import com.ebanswers.wifilibrary.WifiAdmin;
 import com.ebanswers.wifilibrary.WifiConfig;
 import com.ebanswers.wifilibrary.WifiReceiver;
@@ -36,6 +38,7 @@ public class PresenterImpl implements IPresenter {
     private ExecutorService threadPool = Executors.newCachedThreadPool();
     private String current_ssid, current_password;
     private CountDownTimer timer;
+    private StyleConfig.OnConnectedWifiListener onConnectedWifiListener;
     private int currentId;
 
     public PresenterImpl(Context context, final IViewController controller, List<ScanResult> list) {
@@ -231,8 +234,13 @@ public class PresenterImpl implements IPresenter {
 
     @Override
     public void savePassword(String ssid) {
-        if (ssid.equals(current_ssid))
-            WifiConfig.getInstance(mContext).savePasswd(current_ssid, current_password);
+        if (ssid.equals(current_ssid)&&!TextUtils.isEmpty(current_password))
+            WifiConfig.getInstance(mContext).savePasswd(ssid, current_password);
+    }
+
+    @Override
+    public String getPassWord(String ssid) {
+        return WifiConfig.getInstance(mContext).getPasswd(ssid);
     }
 
     @Override
@@ -274,9 +282,20 @@ public class PresenterImpl implements IPresenter {
         WifiAdmin.getInstance(mContext).removeWifi("\"" + current_ssid + "\"");
     }
 
+    @Override
+    public void setOnConnectedWifiListener(StyleConfig.OnConnectedWifiListener onConnectedWifiListener) {
+        this.onConnectedWifiListener = onConnectedWifiListener;
+    }
+
+    @Override
+    public StyleConfig.OnConnectedWifiListener getOnConnectedWifiListener() {
+        return onConnectedWifiListener;
+    }
+
 
     @Override
     public void destory() {
+        WifiReceiver.unBindWifiState(modelController);
         mContext.unregisterReceiver(wifiReceiver);
         if (threadPool != null && !threadPool.isShutdown()) {
             threadPool.shutdownNow();
@@ -287,6 +306,7 @@ public class PresenterImpl implements IPresenter {
         WifiConfig.destory();
         this.viewController = null;
         this.modelController = null;
+        this.onConnectedWifiListener = null;
     }
 
     @Override

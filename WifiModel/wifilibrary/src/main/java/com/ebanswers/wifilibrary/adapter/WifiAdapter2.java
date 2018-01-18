@@ -65,7 +65,7 @@ public class WifiAdapter2 extends BaseAdapter {
         }
         ScanResult result = getItem(position);
         if (result.BSSID.equals(WifiAdmin.getInstance(parent.getContext()).getBSSID()) && NetUtils.isWifi(parent.getContext())) {
-            if (mPresenter != null)
+            if (mPresenter != null && TextUtils.isEmpty(mPresenter.getPassWord(result.SSID)))
                 mPresenter.savePassword(result.SSID);
             viewHolder.connected.setVisibility(View.VISIBLE);
         } else {

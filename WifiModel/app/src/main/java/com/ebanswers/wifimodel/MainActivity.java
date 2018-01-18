@@ -49,13 +49,20 @@ public class MainActivity extends AppCompatActivity {
                 .setBackGroundColor(Color.parseColor("#161B21"))
                 .setItemTextColor(Color.parseColor("#767C78"))
                 .build();
-        WifiFragment.setOnBackClickListener(new StyleConfig.OnBackClickListener() {
+        WifiFragment wifiFragment = WifiFragment.getInstance(styleConfig);
+        wifiFragment.setOnBackClickListener(new StyleConfig.OnBackClickListener() {
             @Override
             public void onClick() {
                 finish();
             }
         });
+        wifiFragment.setOnConnectedWifiListener(new StyleConfig.OnConnectedWifiListener() {
+            @Override
+            public void onConnected() {
+                finish();
+            }
+        });
 
-        fragmentManager.beginTransaction().replace(R.id.id_fl_container, WifiFragment.getInstance(styleConfig)).commitAllowingStateLoss();
+        fragmentManager.beginTransaction().replace(R.id.id_fl_container,wifiFragment).commitAllowingStateLoss();
     }
 }

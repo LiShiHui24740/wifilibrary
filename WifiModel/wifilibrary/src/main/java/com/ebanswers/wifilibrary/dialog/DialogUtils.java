@@ -61,7 +61,11 @@ public class DialogUtils {
         final TextView forget = (TextView) view.findViewById(R.id.id_tv_dialog_forget);
         final TextView close = (TextView) view.findViewById(R.id.id_tv_dialog_close);
         name.setText(scanResult.SSID);
-        if (WifiAdmin.getInstance(activity).IsConfiguration("\""+scanResult.SSID+"\"") != -1||!TextUtils.isEmpty(WifiConfig.getInstance(activity).getPasswd(scanResult.SSID))) {
+        if (!TextUtils.isEmpty(WifiConfig.getInstance(activity).getPasswd(scanResult.SSID))) {
+            password.setText(WifiConfig.getInstance(activity).getPasswd(scanResult.SSID));
+            password.setSelection(WifiConfig.getInstance(activity).getPasswd(scanResult.SSID).length());
+        }
+        if (WifiAdmin.getInstance(activity).IsConfiguration("\"" + scanResult.SSID + "\"") != -1 || !TextUtils.isEmpty(WifiConfig.getInstance(activity).getPasswd(scanResult.SSID))) {
             password.setVisibility(View.GONE);
             showPassWord.setVisibility(View.GONE);
             connect.setEnabled(true);
@@ -90,10 +94,6 @@ public class DialogUtils {
 
             }
         });
-        if (!TextUtils.isEmpty(WifiConfig.getInstance(activity).getPasswd(scanResult.SSID))) {
-            password.setText(WifiConfig.getInstance(activity).getPasswd(scanResult.SSID));
-            password.setSelection(WifiConfig.getInstance(activity).getPasswd(scanResult.SSID).length());
-        }
         showPassWord.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -120,7 +120,6 @@ public class DialogUtils {
                 if (callBack != null) {
                     callBack.ignore();
                 }
-
             }
         });
 
