@@ -179,7 +179,7 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
                 mPresenterImpl.init(mListScanResult);
             }
         });
-        if (onConnectedWifiListener!=null){
+        if (onConnectedWifiListener != null) {
             mPresenterImpl.setOnConnectedWifiListener(onConnectedWifiListener);
         }
     }
@@ -343,6 +343,11 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
         if (loadDialog == null || !loadDialog.isShowing()) {
             loadDialog = DialogUtils.createLoadDialog(mContext);
         }
+        if (mPresenterImpl != null){
+            mPresenterImpl.cancelConnectOutTime();
+            mPresenterImpl.startConnectOutTime();
+        }
+
     }
 
 
@@ -447,7 +452,7 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
         onBackClickListener = listener;
     }
 
-    public  void setOnConnectedWifiListener(StyleConfig.OnConnectedWifiListener listener) {
+    public void setOnConnectedWifiListener(StyleConfig.OnConnectedWifiListener listener) {
         onConnectedWifiListener = listener;
     }
 

@@ -55,11 +55,6 @@ public class ModelControllerImpl implements WifiReceiver.WifiStateChange {
         Log.d("loadDialog", "openingWifi");
         if (mPresenter != null && mPresenter.getViewController() != null) {
             mPresenter.getViewController().showLoadDialog();
-            mPresenter.startConnectOutTime();
-            if (mPresenter.getViewController().getOnConnectCallBack() != null) {
-                if (mlist != null && mlist.size() > 0)
-                    mPresenter.getViewController().getOnConnectCallBack().connectResult(mlist.get(0));
-            }
         }
 
     }

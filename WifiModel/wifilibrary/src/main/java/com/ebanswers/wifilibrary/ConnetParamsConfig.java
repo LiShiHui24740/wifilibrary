@@ -6,7 +6,7 @@ package com.ebanswers.wifilibrary;
 
 public class ConnetParamsConfig {
 
-    private static long sConnectOutTime = 16000;
+    private static long sConnectOutTime = 10000;
     private static OnConnectOutTimeCallBack sConnectOutTimeCallBack;
 
     public static void setConnectOutTime(long connectOutTime) {

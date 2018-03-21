@@ -56,12 +56,12 @@ public class MainActivity extends AppCompatActivity {
                 finish();
             }
         });
-        wifiFragment.setOnConnectedWifiListener(new StyleConfig.OnConnectedWifiListener() {
-            @Override
-            public void onConnected() {
-                finish();
-            }
-        });
+//        wifiFragment.setOnConnectedWifiListener(new StyleConfig.OnConnectedWifiListener() {
+//            @Override
+//            public void onConnected() {
+//                finish();
+//            }
+//        });
 
         fragmentManager.beginTransaction().replace(R.id.id_fl_container,wifiFragment).commitAllowingStateLoss();
     }

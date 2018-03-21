@@ -165,9 +165,9 @@ public class WifiAdmin {
         }
     }
 
-    public int getLinkSpeed(){
-        if (mWifiInfo!=null){
-           return mWifiInfo.getLinkSpeed();
+    public int getLinkSpeed() {
+        if (mWifiInfo != null) {
+            return mWifiInfo.getLinkSpeed();
         }
         return -1;
     }
@@ -175,11 +175,12 @@ public class WifiAdmin {
     /**
      * 得到的值是一个0到-100的区间值，是一个int型数据，其中0到-50表示信号最好，
      * -50到-70表示信号偏差，小于-70表示最差，有可能连接不上或者掉线。
+     *
      * @return
      */
-    public int getRssi(){
-        if (mWifiInfo!=null){
-          return  mWifiInfo.getRssi();
+    public int getRssi() {
+        if (mWifiInfo != null) {
+            return mWifiInfo.getRssi();
         }
         return -100;
     }
@@ -451,9 +452,7 @@ public class WifiAdmin {
                 } else {
                     for (int j = i + 1; j < size; j++) {
                         if (mWifiList.get(i).SSID.equals(mWifiList.get(j).SSID)) {
-                            if (mWifiList.get(i).BSSID.equals(mWifiList.get(j).BSSID)) {
-                                removeList.add(mWifiList.get(i));
-                            }
+                            removeList.add(mWifiList.get(i));
                         }
                     }
                 }
@@ -462,16 +461,13 @@ public class WifiAdmin {
             removeList.clear();
             for (ScanResult scanResult : mWifiList) {
                 if (scanResult.BSSID.equals(getBSSID())) {
-                    if (connect_scanResult != null) {
-                        removeList.add(scanResult);
-                    } else {
-                        connect_scanResult = scanResult;
-                    }
+                    removeList.add(scanResult);
+                    connect_scanResult = scanResult;
                 }
             }
             mWifiList.removeAll(removeList);
+            removeList.clear();
             if (connect_scanResult != null) {
-                mWifiList.remove(connect_scanResult);
                 mWifiList.add(0, connect_scanResult);
             }
         }

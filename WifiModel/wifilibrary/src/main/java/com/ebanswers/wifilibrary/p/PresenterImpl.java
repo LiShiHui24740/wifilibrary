@@ -137,6 +137,7 @@ public class PresenterImpl implements IPresenter {
             final String security = scanResult.capabilities.toLowerCase();
             if (!security.contains("wpa") && !security.contains("wep")) {
                 currentId = connectWifi(scanResult.SSID, "", "");
+                viewController.showLoadDialog();
             } else {
                 if (viewController != null) {
                     viewController.showInputPasswordDialog(scanResult, new DialogUtils.DialogCallBack() {
@@ -151,6 +152,7 @@ public class PresenterImpl implements IPresenter {
                             } else if (security.contains("wep")) {
                                 currentId = connectWifi(scanResult.SSID, passward, "wep");
                             }
+                            viewController.showLoadDialog();
                         }
 
                         @Override
@@ -168,6 +170,7 @@ public class PresenterImpl implements IPresenter {
                         }
                     });
                 }
+
 
             }
 
