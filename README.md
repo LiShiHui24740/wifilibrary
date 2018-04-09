@@ -7,7 +7,7 @@
 ## wifi库,实现了常用的wifi连接.使用在app的build.gradle中添加以下依赖：
 
 ```
-compile 'com.ebanswers:wifilibrary:1.4.8'
+compile 'com.ebanswers:wifilibrary:1.5.8'
 
 ```
 ## 使用wifi模块：
