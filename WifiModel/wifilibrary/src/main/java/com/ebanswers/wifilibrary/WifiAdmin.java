@@ -7,11 +7,14 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.SparseArray;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -414,7 +417,6 @@ public class WifiAdmin {
      * 开始搜索wifi
      **/
     public void startScan() {
-        this.mWifiManager.startScan();
         boolean scan = mWifiManager.startScan();
         if (scan) {
             updateWifiList();
@@ -424,67 +426,84 @@ public class WifiAdmin {
 
     private synchronized void updateWifiList() {
         if (mWifiList != null) {
-            mWifiList.clear();
             List<ScanResult> list = mWifiManager.getScanResults();
-            if (list != null)
+            if (list != null && list.size() > 0) {
+                mWifiList.clear();
                 mWifiList.addAll(list);
+            }
         }
     }
 
     public synchronized void updateConfigure() {
         if (mWifiConfiguration != null) {
-            mWifiConfiguration.clear();
             List<WifiConfiguration> list = mWifiManager.getConfiguredNetworks();
-            if (list != null)
+            if (list != null && list.size() > 0) {
+                mWifiConfiguration.clear();
                 mWifiConfiguration.addAll(list);
+            }
+
         }
     }
 
     public synchronized List<ScanResult> getWifiListWithFilting() {
         updateWifiList();
-        if (mWifiList != null) {
+        if (mWifiList != null && filterWifiLists != null) {
             ArrayList<ScanResult> removeList = new ArrayList<>();
             ScanResult connect_scanResult = null;
             int size = mWifiList.size();
             for (int i = 0; i < size; i++) {
                 if (TextUtils.isEmpty(mWifiList.get(i).SSID)) {
-                    removeList.add(mWifiList.get(i));
-                } else {
-                    for (int j = i + 1; j < size; j++) {
-                        if (mWifiList.get(i).SSID.equals(mWifiList.get(j).SSID)) {
-                            removeList.add(mWifiList.get(i));
-                        }
-                    }
+                    mWifiList.get(i).SSID = "未知";
                 }
             }
-            mWifiList.removeAll(removeList);
+            filterWifiLists.clear();
+            size = mWifiList.size();
+            HashSet<Integer> haveCheck = new HashSet<>();
+            for (int i = 0; i < size; i++) {
+                //已经找过的不再找,减少计算
+                if (haveCheck.contains(i))
+                    continue;
+                //找出相同的ssid的wifi
+                for (int j = i + 1; j < size; j++) {
+                    if (mWifiList.get(i).SSID.equals(mWifiList.get(j).SSID)) {
+                        haveCheck.add(j);
+                        removeList.add(mWifiList.get(j));
+                    }
+                }
+                removeList.add(mWifiList.get(i));
+                ScanResult maxLevel = null;
+                //找出相同ssidwifi中信号最好的wifi一个
+                for (int m = 0; m < removeList.size(); m++) {
+                    if (maxLevel == null) {
+                        maxLevel = removeList.get(m);
+                    }
+                    int maxlevel = WifiManager.calculateSignalLevel(maxLevel.level, 4);
+                    int otherlevel = WifiManager.calculateSignalLevel(removeList.get(m).level, 4);
+                    if (otherlevel > maxlevel)
+                        maxLevel = removeList.get(m);
+                }
+                removeList.clear();
+                //将信号最好的一个加入到过滤列表
+                filterWifiLists.add(maxLevel);
+            }
+            haveCheck.clear();
             removeList.clear();
-            for (ScanResult scanResult : mWifiList) {
+            for (ScanResult scanResult : filterWifiLists) {
                 if (scanResult.BSSID.equals(getBSSID())) {
                     removeList.add(scanResult);
                     connect_scanResult = scanResult;
                 }
             }
-            mWifiList.removeAll(removeList);
+            filterWifiLists.removeAll(removeList);
             removeList.clear();
             if (connect_scanResult != null) {
-                mWifiList.add(0, connect_scanResult);
+                filterWifiLists.add(0, connect_scanResult);
             }
         }
-        if (filterWifiLists != null) {
-            filterWifiLists.clear();
-            filterWifiLists.addAll(mWifiList);
-        }
         return filterWifiLists;
-
     }
 
-
-    /**
-     * 得到接入点的BSSID
-     **/
-    public String GetBSSID() {
-        mWifiInfo = mWifiManager.getConnectionInfo();
-        return (mWifiInfo == null) ? "NULL" : mWifiInfo.getBSSID();
+    public List<ScanResult> getFilterList() {
+        return filterWifiLists;
     }
 }

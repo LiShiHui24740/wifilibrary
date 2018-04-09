@@ -114,6 +114,8 @@ public class PresenterImpl implements IPresenter {
                             int id = WifiAdmin.getInstance(mContext).getNetworkId();
                             WifiAdmin.getInstance(mContext).disconnectWifi(id);
                             WifiAdmin.getInstance(mContext).removeWifi("\"" + scanResult.SSID + "\"", id);
+                            if (modelController != null)
+                                modelController.updateWifiList();
                         }
                         if (viewController != null)
                             viewController.closeDisconnectDialog();
@@ -137,6 +139,7 @@ public class PresenterImpl implements IPresenter {
             final String security = scanResult.capabilities.toLowerCase();
             if (!security.contains("wpa") && !security.contains("wep")) {
                 currentId = connectWifi(scanResult.SSID, "", "");
+                if (viewController != null)
                 viewController.showLoadDialog();
             } else {
                 if (viewController != null) {
@@ -152,6 +155,7 @@ public class PresenterImpl implements IPresenter {
                             } else if (security.contains("wep")) {
                                 currentId = connectWifi(scanResult.SSID, passward, "wep");
                             }
+                            if (viewController != null)
                             viewController.showLoadDialog();
                         }
 
@@ -237,7 +241,7 @@ public class PresenterImpl implements IPresenter {
 
     @Override
     public void savePassword(String ssid) {
-        if (ssid.equals(current_ssid)&&!TextUtils.isEmpty(current_password))
+        if (ssid.equals(current_ssid) && !TextUtils.isEmpty(current_password))
             WifiConfig.getInstance(mContext).savePasswd(ssid, current_password);
     }
 

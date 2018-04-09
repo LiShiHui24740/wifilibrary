@@ -57,6 +57,7 @@ public class DialogUtils {
         TextView name = (TextView) view.findViewById(R.id.id_tv_dialog_wifi_ssid_name);
         final EditText password = (EditText) view.findViewById(R.id.id_et_dialog_password);
         final CheckBox showPassWord = (CheckBox) view.findViewById(R.id.id_cb_dialog_show_password);
+        final LinearLayout forget_container = (LinearLayout) view.findViewById(R.id.id_ll_forget_net);
         final TextView connect = (TextView) view.findViewById(R.id.id_tv_dialog_connect_wifi);
         final TextView forget = (TextView) view.findViewById(R.id.id_tv_dialog_forget);
         final TextView close = (TextView) view.findViewById(R.id.id_tv_dialog_close);
@@ -69,10 +70,12 @@ public class DialogUtils {
             password.setVisibility(View.GONE);
             showPassWord.setVisibility(View.GONE);
             connect.setEnabled(true);
+            forget_container.setVisibility(View.VISIBLE);
         } else {
             password.setVisibility(View.VISIBLE);
             showPassWord.setVisibility(View.VISIBLE);
             connect.setEnabled(false);
+            forget_container.setVisibility(View.GONE);
         }
         password.addTextChangedListener(new TextWatcher() {
             @Override
