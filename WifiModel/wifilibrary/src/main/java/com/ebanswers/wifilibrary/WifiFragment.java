@@ -287,7 +287,7 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
             if (mListScanResult.size() > 0 && WifiAdmin.getInstance(mContext).isWifiEnable()) {
                 mTip.setVisibility(View.GONE);
             }
-            if (mListScanResult.size() > 0 && WifiAdmin.getInstance(mContext).isWifiEnable()&&mWifiToggle.isChecked()){
+            if (mListScanResult.size() > 0 && WifiAdmin.getInstance(mContext).isWifiEnable() && mWifiToggle.isChecked()) {
                 if (layout_type == StyleConfig.TYPE1_1 || layout_type == StyleConfig.TYPE1_2 || layout_type == StyleConfig.TYPE1_NONE) {
                     mListView.setVisibility(View.VISIBLE);
                     mWifiAdapter.notifyDataSetChanged();
@@ -371,11 +371,11 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
 
     @Override
     public void closeAddWifiDialog() {
-        if (addWifiDialog != null) {
+        if (addWifiDialog != null && mContext != null && !mContext.isFinishing()) {
             if (addWifiDialog.isShowing())
                 addWifiDialog.dismiss();
-            addWifiDialog = null;
         }
+        addWifiDialog = null;
     }
 
     @Override
@@ -458,8 +458,16 @@ public class WifiFragment extends Fragment implements IViewController, CompoundB
     }
 
     @Override
-    public void onDestroy() {
+    public void onDestroyView() {
+        super.onDestroyView();
         closeLoadDialog();
+        closeAddWifiDialog();
+        closeDisconnectDialog();
+        closeInputPasswordDialog();
+    }
+
+    @Override
+    public void onDestroy() {
         mPresenterImpl.destory();
         mPresenterImpl = null;
         onBackClickListener = null;
